@@ -101,7 +101,7 @@ public class DSA {
         System.out.println("beta = " + beta.toString(16));
         
         /*
-         * h is an instance of SHA3-256, the cryptographic hash function used 
+         * h is an instance of SHA-256, the cryptographic hash function used 
          * by DSA
          */
         MessageDigest h = MessageDigest.getInstance("SHA-256");
@@ -154,7 +154,7 @@ public class DSA {
              * r = (alpha^k (mod p)) (mod q)
              * 
              * s, the last signature value, is computed as
-             * s = (m + a * r) * k^(-1) (mod q)
+             * s = (m + ar) * k^(-1) (mod q)
              */
             BigInteger r = alpha.modPow(k, p).mod(q);
             BigInteger ar = a.multiply(r);
@@ -174,6 +174,17 @@ public class DSA {
              * 1. hash the encoded message m (which was done earlier)
              * 2. compute y = (alpha^m * beta^r)^(s^(-1) (mod q)) (mod p)
              * 3. check that y = r (mod q)
+             * 
+             * This works because
+             * 
+             * y = (alpha^m * beta^r)^(s^(-1) (mod q)) (mod p)
+             *   = (alpha^m * (alpha^a)^r)^(s^(-1) (mod q)) (mod p)
+             *   = (alpha^m * alpha^(ar))^(s^(-1) (mod q)) (mod p)
+             *   = (alpha^(m + ar))^(s^(-1) (mod q)) (mod p)
+             *   = (alpha^(m + ar))^((m + ar)^(-1) * k (mod q)) (mod p)
+             *   = alpha^((m + ar) * (m + ar)^(-1) * k (mod q)) (mod p)
+             *   = alpha^k (mod p)
+             *   = r (mod q)
              */
             BigInteger power = s.modInverse(q);
             BigInteger base = alpha.modPow(m, p).multiply(beta.modPow(r, p));

@@ -89,7 +89,7 @@ public class DH {
          * Alice would then compute h^a = (alpha^b)^a = alpha^(ab) (mod p).
          * Bob would compute g^b = (alpha^a)^b = alpha^(ab) (mod p).
          * 
-         * These two values are equal, and thus s = g^b  (mod p) = h^a (mod p) 
+         * These two values are equal, and thus s = g^b (mod p) = h^a (mod p) 
          * is the shared secret key.
          */
         // BigInteger s = g.modPow(b, p);

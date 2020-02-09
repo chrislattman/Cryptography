@@ -117,23 +117,13 @@ public class ElGamalSignature {
             }
             
             /*
-             * r is computed as r = alpha^k (mod p)
+             * r, the first signature value, is computed as 
+             * r = alpha^k (mod p)
+             * 
+             * s, the last signature value, is computed as
+             * s = k^(-1) * (ar - m) (mod p - 1)
              */
             BigInteger r = alpha.modPow(k, p);
-            
-            /*
-             * The verification condition is beta^r = alpha^m * r^s (mod p)
-             * 
-             * Since beta = alpha^a (mod p) and r = alpha^k (mod p),
-             * beta^r = alpha^(a * r) = alpha^m * (alpha^k)^s (mod p) 
-             *                        = alpha^m * alpha^(k * s) (mod p)
-             *                        = alpha^(m + k * s) (mod p)
-             * 
-             * Taking the log_alpha of both sides gives
-             * 
-             * a * r = m + k * s (mod p - 1) and therefore
-             * s = (a * r - m) * k^(-1) (mod p - 1)
-             */
             BigInteger ar = a.multiply(r);
             BigInteger pminus1 = p.subtract(BigInteger.ONE);
             BigInteger kInv = k.modInverse(pminus1);
@@ -147,7 +137,18 @@ public class ElGamalSignature {
              * The following code verifies that the signature provided is 
              * a valid signature.
              * 
+             * Since s = k^(-1) * (ar - m) (mod p - 1), 
+             * ks = ar - m (mod p - 1) and thus
+             * ar = m + ks (mod p - 1)
+             * 
              * The verification condition is beta^r = alpha^m * r^s (mod p)
+             * 
+             * This works because beta^r = (alpha^a)^r (mod p)
+             *                           = alpha^(ar) (mod p)
+             *                           = alpha^(m + ks) (mod p)
+             *                           = alpha^m * alpha^(ks) (mod p)
+             *                           = alpha^m * (alpha^k)^s (mod p)
+             *                           = alpha^m * r^s (mod p)
              */
             BigInteger am_rs = alpha.modPow(m, p).multiply(r.modPow(s, p));
             if (beta.modPow(r, p).equals(am_rs.mod(p))) {

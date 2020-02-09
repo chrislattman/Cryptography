@@ -165,7 +165,7 @@ public class SchnorrSignature {
             BigInteger r = new BigInteger(rhash);
             
             /*
-             * s is computed as s = (k + a * r) (mod q)
+             * s is computed as s = (k + ar) (mod q)
              */
             BigInteger ar = a.multiply(r);
             BigInteger s = k.add(ar).mod(q);
@@ -180,6 +180,14 @@ public class SchnorrSignature {
              * 
              * The verification condition is 
              * r = h(m || alpha^s * beta^(-r) (mod p))
+             * 
+             * This works because 
+             * 
+             * alpha^s * beta^(-r) = alpha^s * (alpha^a)^(-r) (mod p)
+             *                     = alpha^s * alpha^(-ar) (mod p)
+             *                     = alpha^(s - ar) (mod p)
+             *                     = alpha^((k + ar) - ar) (mod p)
+             *                     = alpha^k (mod p)
              * 
              * To break down the computation, alpha_s = alpha^s (mod p) and
              * beta_r = beta^(-r) (mod p) are set to BigIntegers, and 
