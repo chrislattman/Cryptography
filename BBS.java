@@ -31,14 +31,16 @@ public class BBS {
         while (!q.testBit(0) || !q.testBit(1)) {
             q = BigInteger.probablePrime(512, random);
         }
-        BigInteger n = p.multiply(q);
         
         /*
+         * n = p * q
+         * 
          * x is in Z*_n, the group of multiplicative inverses mod n
          * 
          * Since x must be invertible under multiplication mod n, it suffices
          * to choose x to be a probable prime less than n.
          */
+        BigInteger n = p.multiply(q);
         BigInteger x = BigInteger.probablePrime(512, random);
         while (x.compareTo(BigInteger.ONE) < 0 || 
                x.compareTo(n.subtract(BigInteger.ONE)) > 0) {

@@ -7,6 +7,10 @@ import java.util.Scanner;
 /**
  * ElGamal Signature Scheme in pure Java.
  * 
+ * Whenever setting up a cryptosystem that uses the Discrete Log Problem, use
+ * a prime p of the form 4k + 3 that is also a safe prime (p = 2q + 1, q is 
+ * also a prime).
+ * 
  * @author Chris Lattman
  *
  */
@@ -75,6 +79,7 @@ public class ElGamalSignature {
          * message and r and s are signature values.
          */
         Scanner scanner = new Scanner(System.in);
+        System.out.println();
         System.out.print("Do you want to sign a message? y/n: ");
         String answer = scanner.next().toLowerCase();
         while (answer.contains("y")) {

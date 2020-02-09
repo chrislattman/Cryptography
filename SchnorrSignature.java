@@ -57,13 +57,13 @@ public class SchnorrSignature {
      * 
      * The public parameters p, q, and alpha are given above. Schnorr uses a 
      * cryptographic hash function to produce a signature. This 
-     * implementation of Schnorr uses SHA3-256.
+     * implementation of Schnorr uses SHA-256.
      * 
      * Public:  (p, q, alpha, beta)
      * Private: (a, k)
      * 
      * @param args not used
-     * @throws NoSuchAlgorithmException non-issue (SHA3-256 is defined)
+     * @throws NoSuchAlgorithmException non-issue (SHA-256 is defined)
      */
     public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
@@ -101,6 +101,12 @@ public class SchnorrSignature {
         System.out.println("beta = " + beta.toString(16));
         
         /*
+         * h is an instance of SHA-256, the cryptographic hash function 
+         * used by Schnorr signatures
+         */
+        MessageDigest h = MessageDigest.getInstance("SHA-256");
+        
+        /*
          * The following loop gives the user the opportunity to sign a
          * message using the created instance of Schnorr signature scheme.
          * 
@@ -108,6 +114,7 @@ public class SchnorrSignature {
          * message and r and s are signature values.
          */
         Scanner scanner = new Scanner(System.in);
+        System.out.println();
         System.out.print("Do you want to sign a message? y/n: ");
         String answer = scanner.next().toLowerCase();
         while (answer.contains("y")) {
@@ -140,12 +147,6 @@ public class SchnorrSignature {
                    k.compareTo(p.subtract(BigInteger.TWO)) > 0) {
                 k = new BigInteger(256, random);
             }
-            
-            /*
-             * h is an instance of SHA3-256, the cryptographic hash function 
-             * used by Schnorr signatures
-             */
-            MessageDigest h = MessageDigest.getInstance("SHA3-256");
             
             /*
              * r is computed as r = h(m || alpha^k (mod p)) 

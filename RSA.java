@@ -23,7 +23,7 @@ public class RSA {
         /*
          * Allows the user to use their own primes instead of randomly
          * generated primes. (Sophie Germain prime, safe prime) pairs are used
-         * because they are resistant to Pollard p - 1 attacks.
+         * because they are resistant to the Pollard p - 1 algorithm.
          */
         Scanner scanner = new Scanner(System.in);
         System.out.print("Would like you use custom primes, i.e. Sophie "
@@ -81,6 +81,7 @@ public class RSA {
          * Messages are encoded using their byte sequences as specified by the 
          * getBytes() String method. (UTF-8, the default charset, is used)
          */
+        System.out.println();
         System.out.print("Do you want to encrypt or decrypt a message? y/n: ");
         String answer = scanner.next().toLowerCase();
         while (answer.contains("y")) {

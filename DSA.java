@@ -57,13 +57,13 @@ public class DSA {
      * 
      * The public parameters p, q, and alpha are given above. DSA uses a 
      * cryptographic hash function to produce a signature. This 
-     * implementation of DSA uses SHA3-256.
+     * implementation of DSA uses SHA-256.
      * 
      * Public:  (p, q, alpha, beta)
      * Private: (a)
      * 
      * @param args not used
-     * @throws NoSuchAlgorithmException non-issue (SHA3-256 is defined)
+     * @throws NoSuchAlgorithmException non-issue (SHA-256 is defined)
      */
     public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
@@ -104,7 +104,7 @@ public class DSA {
          * h is an instance of SHA3-256, the cryptographic hash function used 
          * by DSA
          */
-        MessageDigest h = MessageDigest.getInstance("SHA3-256");
+        MessageDigest h = MessageDigest.getInstance("SHA-256");
         
         /*
          * The following loop gives the user the opportunity to sign a
@@ -114,6 +114,7 @@ public class DSA {
          * message and r and s are signature values.
          */
         Scanner scanner = new Scanner(System.in);
+        System.out.println();
         System.out.print("Do you want to sign a message? y/n: ");
         String answer = scanner.next().toLowerCase();
         while (answer.contains("y")) {
@@ -128,9 +129,9 @@ public class DSA {
             System.out.print("Enter a message to be signed: ");
             scanner.nextLine();
             String message = scanner.nextLine();
-            byte[] m = message.getBytes();
-            byte[] xbytes = h.digest(m);
-            BigInteger x = new BigInteger(xbytes);
+            byte[] mbytes = message.getBytes();
+            byte[] xbytes = h.digest(mbytes);
+            BigInteger m = new BigInteger(xbytes);
             
             /*
              * k is chosen randomly and is in Z*_q, the group of multiplicative 
@@ -153,12 +154,12 @@ public class DSA {
              * r = (alpha^k (mod p)) (mod q)
              * 
              * s, the last signature value, is computed as
-             * s = (x + a * r) * k^(-1) (mod q)
+             * s = (m + a * r) * k^(-1) (mod q)
              */
             BigInteger r = alpha.modPow(k, p).mod(q);
             BigInteger ar = a.multiply(r);
             BigInteger kInv = k.modInverse(q);
-            BigInteger s = x.add(ar).multiply(kInv).mod(q);
+            BigInteger s = m.add(ar).multiply(kInv).mod(q);
             System.out.println("Signed message:");
             System.out.println("m = " + message);
             System.out.println("r = " + r.toString(16));
@@ -171,11 +172,11 @@ public class DSA {
              * The verification process is as follows:
              * 
              * 1. hash the encoded message m (which was done earlier)
-             * 2. compute y = (alpha^x * beta^r)^(s^(-1) (mod q)) (mod p)
+             * 2. compute y = (alpha^m * beta^r)^(s^(-1) (mod q)) (mod p)
              * 3. check that y = r (mod q)
              */
             BigInteger power = s.modInverse(q);
-            BigInteger base = alpha.modPow(x, p).multiply(beta.modPow(r, p));
+            BigInteger base = alpha.modPow(m, p).multiply(beta.modPow(r, p));
             BigInteger y = base.modPow(power, p);
             if (y.mod(q).equals(r)) {
                 System.out.println("Signature is verified.");

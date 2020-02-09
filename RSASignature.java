@@ -14,8 +14,8 @@ import java.util.Scanner;
  * The second scheme, RSA blind signatures, signs a message without knowing
  * the message's contents.
  * 
- * The third scheme, RSA-SHA3, signs messages like RSA signatures but uses the 
- * SHA3-256 cryptographic hash function.
+ * The third scheme, RSA-SHA, signs messages like RSA signatures but uses the 
+ * SHA-256 cryptographic hash function.
  * 
  * @author Chris Lattman
  */
@@ -35,7 +35,7 @@ public class RSASignature {
                 + "schemes:");
             System.out.println("1. RSA signatures");
             System.out.println("2. RSA blind signatures");
-            System.out.println("3. RSA-SHA3");
+            System.out.println("3. RSA-SHA");
             System.out.print("Enter the number of the signature scheme you "
                 + "would like to use: ");
             try {
@@ -67,7 +67,7 @@ public class RSASignature {
      * In all instances of RSA signatures, primes p and q are chosen and kept 
      * private, as well as d and phi(n), whereas n and e are published.
      * 
-     * RSA-SHA3 simply applies a hash function to the encoded message.
+     * RSA-SHA simply applies a hash function to the encoded message.
      * 
      * RSA blind signatures apply a mask to a message so that the owner of the 
      * cryptosystem cannot read the plaintext message, but can still sign it.
@@ -78,7 +78,7 @@ public class RSASignature {
      * @param scanner standard input from the main function
      * @param hash if true, a hash function is used
      * @param blind if true, blind signatures are used
-     * @throws NoSuchAlgorithmException non-issue (SHA3-256 is defined)
+     * @throws NoSuchAlgorithmException non-issue (SHA-256 is defined)
      */
     public static void rsaSignatures(Scanner scanner, boolean hash, 
         boolean blind) throws NoSuchAlgorithmException {
@@ -139,12 +139,12 @@ public class RSASignature {
         byte[] mbytes = message.getBytes();
         
         /*
-         * If RSA-SHA3 was chosen, the message is hashed using SHA3-256. The
+         * If RSA-SHA256 was chosen, the message is hashed using SHA-256. The
          * hash is then used as the encoded "message" for the rest of the
          * algorithm.
          */
         if (hash) {
-            MessageDigest h = MessageDigest.getInstance("SHA3-256");
+            MessageDigest h = MessageDigest.getInstance("SHA-256");
             mbytes = h.digest(mbytes);
         }
         BigInteger m = new BigInteger(mbytes);

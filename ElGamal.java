@@ -79,6 +79,7 @@ public class ElGamal {
          * c2 = m * s (mod p), explained below.
          */
         Scanner scanner = new Scanner(System.in);
+        System.out.println();
         System.out.print("Do you want to encrypt or decrypt a message? y/n: ");
         String answer = scanner.next().toLowerCase();
         while (answer.contains("y")) {

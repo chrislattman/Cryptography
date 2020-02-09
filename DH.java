@@ -6,15 +6,15 @@ import java.security.SecureRandom;
 /**
  * Dicrete Log Diffie-Hellman (DH) Key Exchange in pure Java.
  * 
- * DH is vulnerable to a man-in-the-middle attack. If Eve maintains two
- * separate key exchanges with Alice and Bob, she can intercept messages
- * sent between Alice and Bob, decrypting then reencrypting messages. However,
- * Eve must always maintain these key exchanges; otherwise, her presence
- * becomes known to Alice and Bob. The STS Protocol mitigates such an attack.
- * 
  * Whenever setting up a cryptosystem that uses the Discrete Log Problem, use
  * a prime p of the form 4k + 3 that is also a safe prime (p = 2q + 1, q is 
  * also a prime).
+ * 
+ * DH is vulnerable to a man-in-the-middle attack. If Eve maintains two
+ * separate key exchanges with Alice and Bob, she can intercept messages
+ * sent between Alice and Bob, decrypting then re-encrypting messages. However,
+ * Eve must always maintain these key exchanges; otherwise, her presence
+ * becomes known to Alice and Bob. The STS Protocol mitigates such an attack.
  * 
  * @author Chris Lattman
  */

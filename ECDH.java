@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 /**
- * Elliptic-Curve Diffie-Hellman (ECDH) Key Exchange in pure Java.
+ * Elliptic Curve Diffie-Hellman (ECDH) Key Exchange in pure Java.
  * 
  * This implementation of ECDH defines point addition and point doubling
  * on a Montgomery curve.
@@ -31,7 +31,7 @@ public class ECDH {
         + "A2F79CD65812631A5CF5D3ED";
 
     /**
-     * The Elliptic-Curve Diffie-Hellman (ECDH) key exchange.
+     * The Elliptic Curve Diffie-Hellman (ECDH) key exchange.
      * 
      * The curve used is Curve25519, a Montgomery curve which has base point 
      * G = (x, y) = (9, 147816194475895447910205935684099868872646061346164 \
@@ -74,14 +74,14 @@ public class ECDH {
          * db are chosen until they fall in the valid range.
          */
         SecureRandom random = new SecureRandom();
-        BigInteger da = new BigInteger(253, random);
-        BigInteger db = new BigInteger(253, random);
+        BigInteger da = new BigInteger(n.bitLength(), random);
+        BigInteger db = new BigInteger(n.bitLength(), random);
         while (da.compareTo(BigInteger.ONE) < 0 || 
                da.compareTo(n.subtract(BigInteger.ONE)) > 0 ||
                db.compareTo(BigInteger.ONE) < 0 ||
                db.compareTo(n.subtract(BigInteger.ONE)) > 0) {
-            da = new BigInteger(253, random);
-            db = new BigInteger(253, random);
+            da = new BigInteger(n.bitLength(), random);
+            db = new BigInteger(n.bitLength(), random);
         }
         
         /*
@@ -90,31 +90,29 @@ public class ECDH {
          * private parameters. Their public parameters are both points on the 
          * elliptic curve.
          */
-        Point g = new Point(x, y);
-        Point qa = montgomeryLadder(g, da, a, b, n);
-        Point qb = montgomeryLadder(g, db, a, b, n);
+        BigInteger[] g = {x, y};
+        BigInteger[] qa = montgomeryLadder(g, da, a, b, n);
+        BigInteger[] qb = montgomeryLadder(g, db, a, b, n);
         
         /*
          * Alice computes point da * qb and Bob computes point db * qa. These
          * should give the same result since 
          * da * qb = da * db * G = db * da * G = db * qa
          */
-        Point secretA = montgomeryLadder(qb, da, a, b, n);
-        Point secretB = montgomeryLadder(qa, db, a, b, n);
+        BigInteger[] secretA = montgomeryLadder(qb, da, a, b, n);
+        BigInteger[] secretB = montgomeryLadder(qa, db, a, b, n);
         
-        if (secretA.x.equals(secretB.x) && secretA.y.equals(secretB.y)) {
+        /*
+         * This statement ensures the user that da * qb = db * qa, hence 
+         * Alice and Bob have the same secret key.
+         */
+        if (secretA[0].equals(secretB[0]) && secretA[1].equals(secretB[1])) {
             System.out.println("da * qb = db * qa");
         }
         else {
             // the following line should never be called
             System.out.println("da * qb =/= db * qa");
         }
-        System.out.println(da);
-        System.out.println(secretA.x);
-        System.out.println(secretA.y);
-        System.out.println(db);
-        System.out.println(secretB.x);
-        System.out.println(secretB.y);
     }
     
     /**
@@ -132,10 +130,10 @@ public class ECDH {
      * @param n the order of the field
      * @return the scalar product d * point
      */
-    private static Point montgomeryLadder(Point point, BigInteger d, 
-        BigInteger a, BigInteger b, BigInteger n) {
-        Point r0 = new Point(BigInteger.ZERO, BigInteger.ZERO);
-        Point r1 = point;
+    private static BigInteger[] montgomeryLadder(BigInteger[] point, 
+        BigInteger d, BigInteger a, BigInteger b, BigInteger n) {
+        BigInteger[] r0 = {BigInteger.ZERO, BigInteger.ZERO};
+        BigInteger[] r1 = point;
         int m = d.bitLength() - 1;
         
         for (int i = m; i >= 0; i--) {
@@ -164,15 +162,15 @@ public class ECDH {
      * @param n the order of the field
      * @return point1 + point2
      */
-    private static Point pointAdd(Point point1, Point point2, BigInteger a, 
-        BigInteger b, BigInteger n) {
+    private static BigInteger[] pointAdd(BigInteger[] point1, 
+        BigInteger[] point2, BigInteger a, BigInteger b, BigInteger n) {
         /*
          * The (x, y) coordinates of both points
          */
-        BigInteger x1 = point1.x;
-        BigInteger y1 = point1.y;
-        BigInteger x2 = point2.x;
-        BigInteger y2 = point2.y;
+        BigInteger x1 = point1[0];
+        BigInteger y1 = point1[1];
+        BigInteger x2 = point2[0];
+        BigInteger y2 = point2[1];
         
         /*
          * If either of the points is the identity (point at infinity), return
@@ -185,11 +183,19 @@ public class ECDH {
             return point1;
         }
         
+        /*
+         * If the points are equal, return double one of them.
+         */
         if (x1.equals(x2) && y1.equals(y2)) {
             return pointDouble(point1, a, b, n);
         }
+        
+        /*
+         * If the points are negations of each other, return the identity.
+         */
         if (x1.equals(x2) && y1.equals(y2.negate())) {
-            return new Point(BigInteger.ZERO, BigInteger.ZERO);
+            BigInteger[] identity = {BigInteger.ZERO, BigInteger.ZERO};
+            return identity;
         }
         
         BigInteger y2minusy1 = y2.subtract(y1);
@@ -202,7 +208,7 @@ public class ECDH {
         BigInteger x1minusx3 = x1.subtract(x3);
         BigInteger y3 = alpha.multiply(x1minusx3).subtract(y1).mod(n);
         
-        Point sum = new Point(x3.mod(n), y3);
+        BigInteger[] sum = {x3.mod(n), y3};
         return sum;
     }
     
@@ -217,13 +223,13 @@ public class ECDH {
      * @param n the order of the field
      * @return 2 * point
      */
-    private static Point pointDouble(Point point, BigInteger a, BigInteger b, 
-        BigInteger n) {
+    private static BigInteger[] pointDouble(BigInteger[] point, BigInteger a, 
+        BigInteger b, BigInteger n) {
         /*
          * The (x, y) coordinates of the point
          */
-        BigInteger x = point.x;
-        BigInteger y = point.y;
+        BigInteger x = point[0];
+        BigInteger y = point[1];
         
         /*
          * If the point is the identity (point at infinity), return it.
@@ -246,22 +252,7 @@ public class ECDH {
         BigInteger xminusx2 = x.subtract(x2);
         BigInteger y2 = alpha.multiply(xminusx2).subtract(y).mod(n);
         
-        Point product = new Point(x2.mod(n), y2);
+        BigInteger[] product = {x2.mod(n), y2};
         return product;
-    }
-    
-    /**
-     * An inner Point class used to simplify returning coordinates from other
-     * functions.
-     * 
-     * @author Chris Lattman
-     */
-    private static class Point {
-        BigInteger x, y;
-        
-        Point(BigInteger xcoord, BigInteger ycoord) {
-            x = xcoord;
-            y = ycoord;
-        }
     }
 }
