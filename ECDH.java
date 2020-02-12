@@ -36,6 +36,8 @@ public class ECDH {
      * The curve used is Curve25519, a Montgomery curve which has base point 
      * G = (x, y) = (9, 147816194475895447910205935684099868872646061346164 \
      *                  75288964881837755586237401)
+     *                  
+     * y^2 = x^3 + 486662x^2 + x (mod 2^255 - 19)
      *         
      * Public:  (p, curve (a, b), G = (x, y), n)
      * Private: (da, db)
@@ -91,16 +93,16 @@ public class ECDH {
          * elliptic curve.
          */
         BigInteger[] g = {x, y};
-        BigInteger[] qa = montgomeryLadder(g, da, a, b, n);
-        BigInteger[] qb = montgomeryLadder(g, db, a, b, n);
+        BigInteger[] qa = montgomeryLadder(g, da, a, b, p);
+        BigInteger[] qb = montgomeryLadder(g, db, a, b, p);
         
         /*
          * Alice computes point da * qb and Bob computes point db * qa. These
          * should give the same result since 
          * da * qb = da * db * G = db * da * G = db * qa
          */
-        BigInteger[] secretA = montgomeryLadder(qb, da, a, b, n);
-        BigInteger[] secretB = montgomeryLadder(qa, db, a, b, n);
+        BigInteger[] secretA = montgomeryLadder(qb, da, a, b, p);
+        BigInteger[] secretB = montgomeryLadder(qa, db, a, b, p);
         
         /*
          * This statement ensures the user that da * qb = db * qa, hence 
@@ -127,23 +129,23 @@ public class ECDH {
      * @param d the scalar number of times point is added to itself
      * @param a the curve parameter A
      * @param b the curve parameter B
-     * @param n the order of the field
+     * @param p the prime field
      * @return the scalar product d * point
      */
     private static BigInteger[] montgomeryLadder(BigInteger[] point, 
-        BigInteger d, BigInteger a, BigInteger b, BigInteger n) {
+        BigInteger d, BigInteger a, BigInteger b, BigInteger p) {
         BigInteger[] r0 = {BigInteger.ZERO, BigInteger.ZERO};
         BigInteger[] r1 = point;
         int m = d.bitLength() - 1;
         
         for (int i = m; i >= 0; i--) {
             if (!d.testBit(i)) {
-                r1 = pointAdd(r0, r1, a, b, n);
-                r0 = pointDouble(r0, a, b, n);
+                r1 = pointAdd(r0, r1, a, b, p);
+                r0 = pointDouble(r0, a, b, p);
             }
             else {
-                r0 = pointAdd(r0, r1, a, b, n);
-                r1 = pointDouble(r1, a, b, n);
+                r0 = pointAdd(r0, r1, a, b, p);
+                r1 = pointDouble(r1, a, b, p);
             }
         }
         
@@ -159,11 +161,11 @@ public class ECDH {
      * @param point2 point to be added
      * @param a the curve parameter A
      * @param b the curve parameter B
-     * @param n the order of the field
+     * @param p the prime field
      * @return point1 + point2
      */
     private static BigInteger[] pointAdd(BigInteger[] point1, 
-        BigInteger[] point2, BigInteger a, BigInteger b, BigInteger n) {
+        BigInteger[] point2, BigInteger a, BigInteger b, BigInteger p) {
         /*
          * The (x, y) coordinates of both points
          */
@@ -184,16 +186,9 @@ public class ECDH {
         }
         
         /*
-         * If the points are equal, return double one of them.
+         * If the points are on the same x-axis, return the identity.
          */
-        if (x1.equals(x2) && y1.equals(y2)) {
-            return pointDouble(point1, a, b, n);
-        }
-        
-        /*
-         * If the points are negations of each other, return the identity.
-         */
-        if (x1.equals(x2) && y1.equals(y2.negate())) {
+        if (x1.equals(x2)) {
             BigInteger[] identity = {BigInteger.ZERO, BigInteger.ZERO};
             return identity;
         }
@@ -204,11 +199,11 @@ public class ECDH {
         
         BigInteger aplusx1plusx2 = a.add(x1).add(x2);
         BigInteger x3 = b.multiply(alpha.pow(2)).subtract(
-            aplusx1plusx2);
+            aplusx1plusx2).mod(p);
         BigInteger x1minusx3 = x1.subtract(x3);
-        BigInteger y3 = alpha.multiply(x1minusx3).subtract(y1).mod(n);
+        BigInteger y3 = alpha.multiply(x1minusx3).subtract(y1).mod(p);
         
-        BigInteger[] sum = {x3.mod(n), y3};
+        BigInteger[] sum = {x3, y3};
         return sum;
     }
     
@@ -220,11 +215,11 @@ public class ECDH {
      * @param point the point to be doubled
      * @param a the curve parameter A
      * @param b the curve parameter B
-     * @param n the order of the field
+     * @param p the prime field
      * @return 2 * point
      */
     private static BigInteger[] pointDouble(BigInteger[] point, BigInteger a, 
-        BigInteger b, BigInteger n) {
+        BigInteger b, BigInteger p) {
         /*
          * The (x, y) coordinates of the point
          */
@@ -232,10 +227,11 @@ public class ECDH {
         BigInteger y = point[1];
         
         /*
-         * If the point is the identity (point at infinity), return it.
+         * If the point has a y-coordinate of 0, return the identity.
          */
-        if (x.equals(BigInteger.ZERO) && y.equals(BigInteger.ZERO)) {
-            return point;
+        if (x.equals(BigInteger.ZERO)) {
+            BigInteger[] identity = {BigInteger.ZERO, BigInteger.ZERO};
+            return identity;
         }
         
         BigInteger three = new BigInteger("3");
@@ -247,12 +243,12 @@ public class ECDH {
         
         BigInteger b_alphasquared = b.multiply(alpha.pow(2));
         BigInteger two_x = BigInteger.TWO.multiply(x);
-        BigInteger x2 = b_alphasquared.subtract(a).subtract(two_x);
+        BigInteger x2 = b_alphasquared.subtract(a).subtract(two_x).mod(p);
         
         BigInteger xminusx2 = x.subtract(x2);
-        BigInteger y2 = alpha.multiply(xminusx2).subtract(y).mod(n);
+        BigInteger y2 = alpha.multiply(xminusx2).subtract(y).mod(p);
         
-        BigInteger[] product = {x2.mod(n), y2};
+        BigInteger[] product = {x2, y2};
         return product;
     }
 }

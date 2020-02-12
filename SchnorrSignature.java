@@ -162,7 +162,7 @@ public class SchnorrSignature {
             m = m.shiftLeft(alphak.bitLength());
             m = m.or(alphak);
             byte[] rhash = h.digest(m.toByteArray());
-            BigInteger r = new BigInteger(rhash);
+            BigInteger r = new BigInteger(1, rhash);
             
             /*
              * s is computed as s = (k + ar) (mod q)
@@ -205,7 +205,7 @@ public class SchnorrSignature {
             m = m.shiftLeft(righthalf.bitLength());
             m = m.or(righthalf);
             byte[] hash = h.digest(m.toByteArray());
-            BigInteger rcheck = new BigInteger(hash);
+            BigInteger rcheck = new BigInteger(1, hash);
             if (r.equals(rcheck)) {
                 System.out.println("Signature is verified.");
             }

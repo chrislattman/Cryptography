@@ -53,7 +53,7 @@ public class HMAC {
             }
             System.out.println();
             System.out.print("Enter the hash function you would like: ");
-            String function = scanner.next();
+            String function = scanner.next().toUpperCase();
             
             try {
                 /*
@@ -61,9 +61,10 @@ public class HMAC {
                  */
                 MessageDigest h = MessageDigest.getInstance(function);
                 System.out.print("Enter the message: ");
-                String message = scanner.next();
+                scanner.nextLine();
+                String message = scanner.nextLine();
                 System.out.print("Enter the secret key: ");
-                String key = scanner.next();
+                String key = scanner.nextLine();
                 
                 /*
                  * Messages and keys are encoded using their byte sequences 
@@ -98,13 +99,14 @@ public class HMAC {
                  * If the key length is less than the block size of the
                  * chosen hash function, then the key is padded with zeros
                  * to the right by shifting the key to the left. The shift
-                 * amount is the difference in bits between blocksizebytes
-                 * and bytes.
+                 * amount is the difference in bits between the block size
+                 * and the key size.
                  */
                 if (kbits > blocksizebits) {
                     byte[] oldk = k.toByteArray();
                     byte[] newk = h.digest(oldk);
-                    k = new BigInteger(newk);
+                    k = new BigInteger(1, newk);
+                    kbits = k.bitLength();
                 }
                 if (kbits < blocksizebits) {
                     int remainder = blocksizebits - kbits;
@@ -123,9 +125,9 @@ public class HMAC {
                 BigInteger opad = new BigInteger("5C", 16);
                 BigInteger ipad = new BigInteger("36", 16);
                 for (int i = 1; i < blocksizebits / 8; i++) {
-                    opad = opad.shiftLeft(8);
-                    ipad = ipad.shiftLeft(8);
-                    opad = opad.or(opadconst);
+                    opad = opad.shiftLeft(8); 
+                    ipad = ipad.shiftLeft(8); 
+                    opad = opad.or(opadconst); 
                     ipad = ipad.or(ipadconst);
                 }
                 
@@ -146,9 +148,14 @@ public class HMAC {
                 
                 /*
                  * k_ipad is shifted left to give room to be ORed, or
-                 * concatenated, with message m. It is then ORed with m.
+                 * concatenated, with message m. If the message's bit length 
+                 * isn't an even multiple of 4, extra 0s are padded to the 
+                 * left. k_ipad is then ORed with m.
                  */
                 k_ipad = k_ipad.shiftLeft(m.bitLength());
+                if (m.bitLength() % 4 != 0) {
+                    k_ipad = k_ipad.shiftLeft(4 - (m.bitLength() % 4));
+                }
                 k_ipad = k_ipad.or(m);
                 
                 /*
@@ -157,14 +164,18 @@ public class HMAC {
                  * to a BigInteger for the next step.
                  */
                 byte[] righthalfhash = h.digest(k_ipad.toByteArray());
-                BigInteger righthalf = new BigInteger(righthalfhash);
+                BigInteger righthalf = new BigInteger(1, righthalfhash);
                 
                 /*
                  * k_opad is shifted left to give room to be ORed, or
-                 * concatenated, with righthalf. k_opad is then ORed with
-                 * righthalf.
+                 * concatenated, with righthalf. If righthalf's bit length 
+                 * isn't an even multiple of 4, extra 0s are padded to the 
+                 * left. k_opad is then ORed with righthalf.
                  */
                 k_opad = k_opad.shiftLeft(righthalf.bitLength());
+                if (righthalf.bitLength() % 4 != 0) {
+                    k_opad = k_opad.shiftLeft(4 - (righthalf.bitLength() % 4));
+                }
                 k_opad = k_opad.or(righthalf);
                 
                 /*
@@ -173,7 +184,7 @@ public class HMAC {
                  * The hash is converted to a BigInteger and returned.
                  */
                 byte[] hash = h.digest(k_opad.toByteArray());
-                BigInteger hashvalue = new BigInteger(hash);
+                BigInteger hashvalue = new BigInteger(1, hash);
                 System.out.println(hashvalue.toString(16));
             }
             catch (Exception e) {

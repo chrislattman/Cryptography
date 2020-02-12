@@ -131,7 +131,7 @@ public class DSA {
             String message = scanner.nextLine();
             byte[] mbytes = message.getBytes();
             byte[] xbytes = h.digest(mbytes);
-            BigInteger m = new BigInteger(xbytes);
+            BigInteger m = new BigInteger(1, xbytes);
             
             /*
              * k is chosen randomly and is in Z*_q, the group of multiplicative 

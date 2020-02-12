@@ -147,7 +147,7 @@ public class RSASignature {
             MessageDigest h = MessageDigest.getInstance("SHA-256");
             mbytes = h.digest(mbytes);
         }
-        BigInteger m = new BigInteger(mbytes);
+        BigInteger m = new BigInteger(1, mbytes);
         
         /*
          * If blind signatures are used, the message is masked.

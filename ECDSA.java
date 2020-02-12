@@ -122,7 +122,7 @@ public class ECDSA {
             String message = scanner.nextLine();
             byte[] m = message.getBytes();
             byte[] hashbytes = h.digest(m);
-            BigInteger e = new BigInteger(hashbytes);
+            BigInteger e = new BigInteger(1, hashbytes);
             
             /*
              * z is the n.bitLength() (253) leftmost bits of e

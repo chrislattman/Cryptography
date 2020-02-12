@@ -11,7 +11,7 @@ import java.util.Scanner;
  * @author Chris Lattman
  */
 public class AES {
-    static int[] powers = {1, 2, 4, 8, 16, 32, 64, 128, 27, 64};
+    static int[] powers = {1, 2, 4, 8, 16, 32, 64, 128, 27, 54};
     static int[] Sbox = {0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 
         0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
         0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 
@@ -52,59 +52,60 @@ public class AES {
      */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("This is the AES algorithm.");
-        
-        String direction = "";
-        while (!direction.toLowerCase().equals("encrypt") && 
-               !direction.toLowerCase().equals("decrypt")) {
-            System.out.print("Enter encrypt or decrypt: ");
-            direction = scanner.next();
-            System.out.println();
-        }
-        
-        String mode = "";
-        while (!mode.toUpperCase().equals("ECB") && 
-               !mode.toUpperCase().equals("CBC")) {
-            System.out.print("Enter the mode (ECB or CBC): ");
-            mode = scanner.next();
-            System.out.println();
-        }
-        
-        int bits = 0;
-        while (bits != 128 && bits != 192 && bits != 256) {
-            System.out.print("Enter 128, 192, or 256 for bits: ");
-            bits = scanner.nextInt();
-            System.out.println();
-        }
-        
-        String key = "";
-        int numkeybits = key.getBytes().length * 4; // multiplied by 4 since
-        while (numkeybits != bits) {                // string digits are bytes
-            System.out.print("Enter a " + bits + "-bit key: ");
-            key = scanner.next();
-            while (key.length() < 32) {
-                key = "0" + key;
+        System.out.print("Would you like to encrypt or decrypt a "
+            + "message? y/n: ");
+        String answer = scanner.next();
+        while (answer.contains("y")) {
+            String direction = "";
+            while (!direction.toLowerCase().equals("encrypt") && 
+                   !direction.toLowerCase().equals("decrypt")) {
+                System.out.print("Enter encrypt or decrypt: ");
+                direction = scanner.next();
             }
-            numkeybits = key.getBytes().length * 4;
+            
+            String mode = "";
+            while (!mode.toUpperCase().equals("ECB") && 
+                   !mode.toUpperCase().equals("CBC")) {
+                System.out.print("Enter the mode (ECB or CBC): ");
+                mode = scanner.next();
+            }
+            
+            int bits = 0;
+            while (bits != 128 && bits != 192 && bits != 256) {
+                System.out.print("Enter 128, 192, or 256 for bits: ");
+                bits = scanner.nextInt();
+            }
+            
+            String key = "";
+            int numkeybits = key.getBytes().length * 4;// multiplied by 4 since
+            while (numkeybits != bits) {               // string digits = bytes
+                System.out.print("Enter a " + bits + "-bit key: ");
+                key = scanner.next();
+                while (key.length() < bits / 8) {
+                    key = "0" + key;
+                }
+                numkeybits = key.getBytes().length * 4;
+            }
+            
+            if (direction.equals("encrypt")) {
+                System.out.print("Enter the plaintext: ");
+                scanner.nextLine();
+                String plaintext = scanner.nextLine();
+                System.out.print("ciphertext: ");
+                aes(plaintext, key, bits, mode); //print this out
+            }
+            else {
+                System.out.print("Enter the ciphertext: ");
+                //String ciphertext = scanner.nextLine();
+                System.out.print("plaintext: ");
+                //decrypt(ciphertext, key, bits, mode);
+            }
+            
             System.out.println();
+            System.out.print("Would you like to encrypt or decrypt a "
+                + "message? y/n: ");
+            answer = scanner.next();
         }
-        
-        if (direction.equals("encrypt")) {
-            System.out.print("Enter the plaintext: ");
-            scanner.nextLine();
-            String plaintext = scanner.nextLine();
-            System.out.println();
-            System.out.print("ciphertext: ");
-            aes(plaintext, key, bits, mode); //print this out
-        }
-        else {
-            System.out.print("Enter the ciphertext: ");
-            //String ciphertext = scanner.nextLine();
-            System.out.println();
-            System.out.print("plaintext: ");
-            //decrypt(ciphertext, key, bits, mode);
-        }
-        
         scanner.close();
     }
 
@@ -150,7 +151,7 @@ public class AES {
         System.arraycopy(keybytes, 0, roundKey, 0, keybytes.length);
         int columns = keybytes.length / 4;
         
-        for (int i = 4 * columns; i <= 43 * columns; i += columns) {
+        for (int i = 4 * columns; i < 43 * columns; i += columns) {
             if (i / columns % 4 != 0) {
                 roundKey[i] = (byte) (roundKey[i - 4] ^ roundKey[i - 16]);
                 roundKey[i + 1] = (byte) (roundKey[i - 3] ^ roundKey[i - 15]);
