@@ -188,6 +188,10 @@ public class SchnorrSignature {
              *                     = alpha^(s - ar) (mod p)
              *                     = alpha^((k + ar) - ar) (mod p)
              *                     = alpha^k (mod p)
+             *                     
+             * Therefore,
+             * 
+             * h(m || alpha^s * beta^(-r) (mod p)) = h(m || alpha^k (mod p))
              * 
              * To break down the computation, alpha_s = alpha^s (mod p) and
              * beta_r = beta^(-r) (mod p) are set to BigIntegers, and 
