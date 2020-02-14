@@ -55,6 +55,8 @@ public class ECDH {
         BigInteger x = new BigInteger("9");
         BigInteger y = new BigInteger(ycoord, 16);
         BigInteger n = new BigInteger(order, 16);
+        BigInteger[] quotient = n.divideAndRemainder(new BigInteger("8"));
+        System.out.println(quotient[0] + " " + quotient[1]);
         System.out.println("Public parameters:");
         System.out.println("Curve25519 is used");
         System.out.println("curve: By^2 = x^3 + Ax^2 + x, where:");
@@ -134,7 +136,8 @@ public class ECDH {
      */
     private static BigInteger[] montgomeryLadder(BigInteger[] point, 
         BigInteger d, BigInteger a, BigInteger b, BigInteger p) {
-        BigInteger[] r0 = {BigInteger.ZERO, BigInteger.ZERO};
+        BigInteger[] r0 = {BigInteger.ZERO, 
+            BigInteger.TWO.pow(Integer.MAX_VALUE - 1)};
         BigInteger[] r1 = point;
         int m = d.bitLength() - 1;
         
@@ -175,21 +178,32 @@ public class ECDH {
         BigInteger y2 = point2[1];
         
         /*
+         * If the points are identical, return double one of them.
+         */
+        if (x1.equals(x2) && y1.equals(y2)) {
+            return pointDouble(point1, a, b, p);
+        }
+        
+        /*
          * If either of the points is the identity (point at infinity), return
          * the other point.
          */
-        if (x1.equals(BigInteger.ZERO) && y1.equals(BigInteger.ZERO)) {
+        if (x1.equals(BigInteger.ZERO) && y1.equals(
+            BigInteger.TWO.pow(Integer.MAX_VALUE - 1))) {
             return point2;
         }
-        if (x2.equals(BigInteger.ZERO) && y2.equals(BigInteger.ZERO)) {
+        if (x2.equals(BigInteger.ZERO) && y2.equals(
+            BigInteger.TWO.pow(Integer.MAX_VALUE - 1))) {
             return point1;
         }
         
         /*
-         * If the points are on the same x-axis, return the identity.
+         * If the points lie on the same x-axis and are inverses, return the
+         * identity.
          */
-        if (x1.equals(x2)) {
-            BigInteger[] identity = {BigInteger.ZERO, BigInteger.ZERO};
+        if (x1.equals(x2) && y1.add(y2).equals(p)) {
+            BigInteger[] identity = {BigInteger.ZERO, 
+                BigInteger.TWO.pow(Integer.MAX_VALUE - 1)};
             return identity;
         }
         
@@ -227,11 +241,11 @@ public class ECDH {
         BigInteger y = point[1];
         
         /*
-         * If the point has a y-coordinate of 0, return the identity.
+         * If the point is the identity, return it.
          */
-        if (x.equals(BigInteger.ZERO)) {
-            BigInteger[] identity = {BigInteger.ZERO, BigInteger.ZERO};
-            return identity;
+        if (x.equals(BigInteger.ZERO) && y.equals(
+            BigInteger.TWO.pow(Integer.MAX_VALUE - 1))) {
+            return point;
         }
         
         BigInteger three = new BigInteger("3");

@@ -122,12 +122,12 @@ public class HMAC {
                  */
                 BigInteger opadconst = new BigInteger("5C", 16);
                 BigInteger ipadconst = new BigInteger("36", 16);
-                BigInteger opad = new BigInteger("5C", 16);
-                BigInteger ipad = new BigInteger("36", 16);
+                BigInteger opad = opadconst;
+                BigInteger ipad = ipadconst;
                 for (int i = 1; i < blocksizebits / 8; i++) {
-                    opad = opad.shiftLeft(8); 
-                    ipad = ipad.shiftLeft(8); 
-                    opad = opad.or(opadconst); 
+                    opad = opad.shiftLeft(8);
+                    ipad = ipad.shiftLeft(8);
+                    opad = opad.or(opadconst);
                     ipad = ipad.or(ipadconst);
                 }
                 
