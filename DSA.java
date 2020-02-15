@@ -56,7 +56,7 @@ public class DSA {
      * The Digital Signature Algorithm (DSA).
      * 
      * The public parameters p, q, and alpha are given above. DSA uses a 
-     * cryptographic hash function to produce a signature. This 
+     * cryptographic hash function to produce a signed message. This 
      * implementation of DSA uses SHA-256.
      * 
      * Public:  (p, q, alpha, beta)
@@ -166,8 +166,8 @@ public class DSA {
             System.out.println("s = " + s.toString(16));
             
             /*
-             * The following code verifies that the signature provided is 
-             * a valid signature.
+             * The following code verifies that the signed message provided is 
+             * valid.
              * 
              * The verification process is as follows:
              * 

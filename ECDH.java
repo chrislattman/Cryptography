@@ -6,38 +6,54 @@ import java.security.SecureRandom;
 /**
  * Elliptic Curve Diffie-Hellman (ECDH) Key Exchange in pure Java.
  * 
- * This implementation of ECDH defines point addition and point doubling
- * on a Montgomery curve.
+ * This implementation of ECDH uses secp256r1, and the public parameters
+ * below were taken from https://www.secg.org/SEC2-Ver-1.0.pdf
  * 
  * @author Chris Lattman
  */
 public class ECDH {
     /*
-     * The Curve25519 prime = 2^255 - 19
+     * The secp256r1 'a' coefficient.
      */
-    public static String prime = "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-        + "FFFFFFFFFFFFFFFFFFFFFFED";
+    public static String acoef = "FFFFFFFF00000001000000000000000000000000"
+        + "FFFFFFFFFFFFFFFFFFFFFFFC";
     
     /*
-     * The Curve25519 y-coordinate for base point x = 9
+     * The secp256r1 'b' coefficient.
      */
-    public static String ycoord = "20AE19A1B8A086B4E01EDD2C7748D14C923D4D7"
-        + "E6D7C61B229E9C5A27ECED3D9";
+    public static String bcoef = "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0"
+        + "CC53B0F63BCE3C3E27D2604B";
     
     /*
-     * The order of the chosen point in the curve
+     * The secp256r1 prime = 2^224 * (2^32 - 1) + 2^192 + 2^96 - 1
      */
-    public static String order = "1000000000000000000000000000000014DEF9DE"
-        + "A2F79CD65812631A5CF5D3ED";
+    public static String prime = "FFFFFFFF00000001000000000000000000000000"
+        + "FFFFFFFFFFFFFFFFFFFFFFFF";
+    
+    /*
+     * The secp256r1 base point (generator point) x-coordinate.
+     */
+    public static String xcoord = "6B17D1F2E12C4247F8BCE6E563A440F277037D8"
+        + "12DEB33A0F4A13945D898C296";
+    
+    /*
+     * The secp256r1 base point (generator point) y-coordinate.
+     */
+    public static String ycoord = "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE335"
+        + "76B315ECECBB6406837BF51F5";
+    
+    /*
+     * The order of the secp256r1 generator point (cofactor is 1).
+     */
+    public static String order = "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAAD"
+        + "A7179E84F3B9CAC2FC632551";
 
     /**
      * The Elliptic Curve Diffie-Hellman (ECDH) key exchange.
      * 
-     * The curve used is Curve25519, a Montgomery curve which has base point 
-     * G = (x, y) = (9, 147816194475895447910205935684099868872646061346164 \
-     *                  75288964881837755586237401)
+     * The curve used is secp256r1 using base point G = (x, y)
      *                  
-     * y^2 = x^3 + 486662x^2 + x (mod 2^255 - 19)
+     * y^2 = x^3 + a * x + b (mod p)
      *         
      * Public:  (p, curve (a, b), G = (x, y), n)
      * Private: (da, db)
@@ -49,19 +65,16 @@ public class ECDH {
          * Alice and Bob publicly agree to use the curve (a, b) with prime p 
          * and base point (x, y) with order n.
          */
-        BigInteger a = new BigInteger("486662");
-        BigInteger b = BigInteger.ONE;
+        BigInteger a = new BigInteger(acoef, 16);
+        BigInteger b = new BigInteger(bcoef, 16);
         BigInteger p = new BigInteger(prime, 16);
-        BigInteger x = new BigInteger("9");
+        BigInteger x = new BigInteger(xcoord, 16);
         BigInteger y = new BigInteger(ycoord, 16);
         BigInteger n = new BigInteger(order, 16);
-        BigInteger[] quotient = n.divideAndRemainder(new BigInteger("8"));
-        System.out.println(quotient[0] + " " + quotient[1]);
-        System.out.println("Public parameters:");
-        System.out.println("Curve25519 is used");
-        System.out.println("curve: By^2 = x^3 + Ax^2 + x, where:");
-        System.out.println("A = " + a);
-        System.out.println("B = " + b);
+        System.out.println("Public parameters for secp256r1");
+        System.out.println("curve: y^2 = x^3 + ax + b (mod p), where:");
+        System.out.println("a = " + a);
+        System.out.println("b = " + b);
         System.out.println("p = " + p);
         System.out.println("with base point G = (x, y), where:");
         System.out.println("x = " + x);
@@ -72,7 +85,7 @@ public class ECDH {
          * Alice generates da randomly and Bob generates db randomly. These
          * are both private.
          * 
-         * The range of da and db is [1, n - 1] (n is 253 bits long)
+         * The range of da and db is [1, n - 1] (n is 256 bits long)
          * 
          * If da or db are not in the acceptable range, new values of da and 
          * db are chosen until they fall in the valid range.
@@ -136,8 +149,7 @@ public class ECDH {
      */
     private static BigInteger[] montgomeryLadder(BigInteger[] point, 
         BigInteger d, BigInteger a, BigInteger b, BigInteger p) {
-        BigInteger[] r0 = {BigInteger.ZERO, 
-            BigInteger.TWO.pow(Integer.MAX_VALUE - 1)};
+        BigInteger[] r0 = {BigInteger.ZERO, BigInteger.ZERO};
         BigInteger[] r1 = point;
         int m = d.bitLength() - 1;
         
@@ -156,9 +168,7 @@ public class ECDH {
     }
     
     /**
-     * The point addition function assumes that p1 is not equal to p2.
-     * 
-     * This is specifically for a Montgomery curve.
+     * The point addition function adds distinct non-identity points.
      * 
      * @param point1 point to be added
      * @param point2 point to be added
@@ -188,12 +198,10 @@ public class ECDH {
          * If either of the points is the identity (point at infinity), return
          * the other point.
          */
-        if (x1.equals(BigInteger.ZERO) && y1.equals(
-            BigInteger.TWO.pow(Integer.MAX_VALUE - 1))) {
+        if (x1.equals(BigInteger.ZERO) && y1.equals(BigInteger.ZERO)) {
             return point2;
         }
-        if (x2.equals(BigInteger.ZERO) && y2.equals(
-            BigInteger.TWO.pow(Integer.MAX_VALUE - 1))) {
+        if (x2.equals(BigInteger.ZERO) && y2.equals(BigInteger.ZERO)) {
             return point1;
         }
         
@@ -202,20 +210,21 @@ public class ECDH {
          * identity.
          */
         if (x1.equals(x2) && y1.add(y2).equals(p)) {
-            BigInteger[] identity = {BigInteger.ZERO, 
-                BigInteger.TWO.pow(Integer.MAX_VALUE - 1)};
+            BigInteger[] identity = {BigInteger.ZERO, BigInteger.ZERO};
             return identity;
         }
         
-        BigInteger y2minusy1 = y2.subtract(y1);
-        BigInteger x2minusx1 = x2.subtract(x1);
-        BigInteger alpha = y2minusy1.divide(x2minusx1);
+        /*
+         * x3 = alpha^2 - x1 - x2 (mod p) and
+         * y3 = alpha * (x1 - x3) - y1 (mod p), where
+         * 
+         * alpha = (y2 - y1) / (x2 - x1) (mod p)
+         */
+        BigInteger alpha = y2.subtract(y1).mod(p).multiply(
+            (x2.subtract(x1)).modInverse(p));
         
-        BigInteger aplusx1plusx2 = a.add(x1).add(x2);
-        BigInteger x3 = b.multiply(alpha.pow(2)).subtract(
-            aplusx1plusx2).mod(p);
-        BigInteger x1minusx3 = x1.subtract(x3);
-        BigInteger y3 = alpha.multiply(x1minusx3).subtract(y1).mod(p);
+        BigInteger x3 = alpha.pow(2).subtract(x1).subtract(x2).mod(p);
+        BigInteger y3 = (alpha.multiply(x1.subtract(x3))).subtract(y1).mod(p);
         
         BigInteger[] sum = {x3, y3};
         return sum;
@@ -223,8 +232,6 @@ public class ECDH {
     
     /**
      * The point double function "doubles" the point using curve arithmetic.
-     * 
-     * This is specifically for a Montgomery curve.
      * 
      * @param point the point to be doubled
      * @param a the curve parameter A
@@ -243,24 +250,24 @@ public class ECDH {
         /*
          * If the point is the identity, return it.
          */
-        if (x.equals(BigInteger.ZERO) && y.equals(
-            BigInteger.TWO.pow(Integer.MAX_VALUE - 1))) {
+        if (x.equals(BigInteger.ZERO) && y.equals(BigInteger.ZERO)) {
             return point;
         }
         
+        /*
+         * x2 = alpha^2 - 2x (mod p) and
+         * y2 = alpha * (x - x2) - y (mod p), where
+         * 
+         * alpha = (3 * x + a) / (2 * y) (mod p)
+         */
         BigInteger three = new BigInteger("3");
-        BigInteger three_xsquared = three.multiply(x.pow(2));
-        BigInteger two_a_x = BigInteger.TWO.multiply(a).multiply(x);
-        BigInteger numerator = three_xsquared.add(two_a_x).add(BigInteger.ONE);
-        BigInteger denominator = BigInteger.TWO.multiply(b).multiply(y);
-        BigInteger alpha = numerator.divide(denominator);
+        BigInteger three_xsquared_a = three.multiply(x.pow(2)).add(a);
+        BigInteger two_y = BigInteger.TWO.multiply(y);
+        BigInteger alpha = three_xsquared_a.mod(p).multiply(
+            two_y.modInverse(p));
         
-        BigInteger b_alphasquared = b.multiply(alpha.pow(2));
-        BigInteger two_x = BigInteger.TWO.multiply(x);
-        BigInteger x2 = b_alphasquared.subtract(a).subtract(two_x).mod(p);
-        
-        BigInteger xminusx2 = x.subtract(x2);
-        BigInteger y2 = alpha.multiply(xminusx2).subtract(y).mod(p);
+        BigInteger x2 = alpha.pow(2).subtract(x).subtract(x).mod(p);
+        BigInteger y2 = (alpha.multiply(x.subtract(x2))).subtract(y).mod(p);
         
         BigInteger[] product = {x2, y2};
         return product;

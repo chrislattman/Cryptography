@@ -206,8 +206,8 @@ public class RSASignature {
         System.out.println("y = " + y.toString(16));
         
         /*
-         * The following code verifies that the signature provided is 
-         * a valid signature.
+         * The following code verifies that the signed message provided is 
+         * valid.
          * 
          * The receiver of the signed message checks that y^e = m (mod n).
          * 

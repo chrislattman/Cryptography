@@ -56,7 +56,7 @@ public class SchnorrSignature {
      * The Schnorr Signature Scheme.
      * 
      * The public parameters p, q, and alpha are given above. Schnorr uses a 
-     * cryptographic hash function to produce a signature. This 
+     * cryptographic hash function to produce a signed message. This 
      * implementation of Schnorr uses SHA-256.
      * 
      * Public:  (p, q, alpha, beta)
@@ -175,8 +175,8 @@ public class SchnorrSignature {
             System.out.println("s = " + s.toString(16));
             
             /*
-             * The following code verifies that the signature provided is 
-             * a valid signature.
+             * The following code verifies that the signed message provided is 
+             * valid.
              * 
              * The verification condition is 
              * r = h(m || alpha^s * beta^(-r) (mod p))

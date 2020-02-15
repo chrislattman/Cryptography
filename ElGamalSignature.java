@@ -134,8 +134,8 @@ public class ElGamalSignature {
             System.out.println("s = " + s.toString(16));
             
             /*
-             * The following code verifies that the signature provided is 
-             * a valid signature.
+             * The following code verifies that the signed message provided is 
+             * valid.
              * 
              * Since s = k^(-1) * (ar - m) (mod p - 1), 
              * ks = ar - m (mod p - 1) and thus
