@@ -92,13 +92,14 @@ public class DH {
          * These two values are equal, and thus s = g^b (mod p) = h^a (mod p) 
          * is the shared secret key.
          */
-        // BigInteger s = g.modPow(b, p);
+        BigInteger secretA = g.modPow(b, p);
+        BigInteger secretB = h.modPow(a, p);
         
         /*
          * This statement ensures the user that g^b (mod p) = h^a (mod p), 
          * hence Alice and Bob have the same secret key.
          */
-        if (g.modPow(b, p).equals(h.modPow(a, p))) {
+        if (secretA.equals(secretB)) {
             System.out.println("g^b (mod p) = h^a (mod p)");
         }
         else {
