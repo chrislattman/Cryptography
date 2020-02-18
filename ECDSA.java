@@ -212,10 +212,10 @@ public class ECDSA {
              * 
              * 1. check that r and s are integers in [1, n - 1]
              * 2. hash the encoded message m (which was done earlier)
-             * 3. let e be the n.bitLength() leftmost bits in m
+             * 3. let e be the n.bitLength() leftmost bits in m (done earlier)
              * 4. compute u1 = e * s^(-1) (mod n) and u2 = r * s^(-1) (mod n)
              * 5. check that (x2, y2) = u1 * g + u2 * q =/= 0
-             * 6. check that r = x1 (mod n)
+             * 6. check that r = x2 (mod n)
              */
             boolean firststeps = true;
             if (q[0].equals(BigInteger.ZERO) && 
@@ -226,29 +226,31 @@ public class ECDSA {
                 q[0].pow(3).add(a.multiply(q[0])).add(b).mod(p))) {
                 firststeps = false;
             }
-            BigInteger[] nqa = montgomeryLadder(q, n, a, b, p);
-            if (!nqa[0].equals(BigInteger.ZERO) || 
-                !nqa[0].equals(BigInteger.ZERO)) {
+            BigInteger[] nq = montgomeryLadder(q, n, a, b, p);
+            if (!nq[0].equals(BigInteger.ZERO) || 
+                !nq[1].equals(BigInteger.ZERO)) {
                 firststeps = false;
             }
             
             if (firststeps) {
                 boolean valid = true;
                 if (r.compareTo(BigInteger.ONE) < 0 || 
-                    r.compareTo(n) >= 0) {
+                    r.compareTo(n) >= 0 ||
+                    s.compareTo(BigInteger.ONE) < 0 ||
+                    s.compareTo(n) >= 0) {
                     valid = false;
                 }
                 BigInteger u1 = e.multiply(s.modInverse(n)).mod(n);
                 BigInteger u2 = r.multiply(s.modInverse(n)).mod(n);
                 BigInteger[] u1g = montgomeryLadder(g, u1, a, b, p);
                 BigInteger[] u2q = montgomeryLadder(q, u2, a, b, p);
-                BigInteger[] sum = pointAdd(u1g, u2q, a, b, p);
-                if (sum[0].equals(BigInteger.ZERO) && 
-                    sum[1].equals(BigInteger.ZERO)) {
+                BigInteger[] x2y2 = pointAdd(u1g, u2q, a, b, p);
+                if (x2y2[0].equals(BigInteger.ZERO) && 
+                    x2y2[1].equals(BigInteger.ZERO)) {
                     valid = false;
                 }
                 
-                if (valid && r.equals(sum[0].mod(n))) {
+                if (valid && r.equals(x2y2[0].mod(n))) {
                     System.out.println("Signature is verified.");
                 }
                 else {
