@@ -51,12 +51,12 @@ public class ECDH {
     /**
      * The Elliptic Curve Diffie-Hellman (ECDH) key exchange.
      * 
-     * The curve used is secp256r1 using base point G = (x, y)
+     * The curve used is secp256r1 using base point g = (x, y)
      *                  
-     * y^2 = x^3 + a * x + b (mod p)
+     * y^2 = x^3 + ax + b (mod p)
      *         
-     * Public:  (p, curve (a, b), G = (x, y), n)
-     * Private: (da, db)
+     * Public:  (p, curve (a, b), g = (x, y), n, qa, qb)
+     * Private: (da, db, s)
      * 
      * @param args not used
      */
@@ -73,13 +73,13 @@ public class ECDH {
         BigInteger n = new BigInteger(order, 16);
         System.out.println("Public parameters for secp256r1");
         System.out.println("curve: y^2 = x^3 + ax + b (mod p), where:");
-        System.out.println("a = " + a);
-        System.out.println("b = " + b);
-        System.out.println("p = " + p);
-        System.out.println("with base point G = (x, y), where:");
-        System.out.println("x = " + x);
-        System.out.println("y = " + y);
-        System.out.println("and G has order " + n);
+        System.out.println("a = " + a.toString(16));
+        System.out.println("b = " + b.toString(16));
+        System.out.println("p = " + p.toString(16));
+        System.out.println("with base point g = (x, y), where:");
+        System.out.println("x = " + x.toString(16));
+        System.out.println("y = " + y.toString(16));
+        System.out.println("and g has order " + n.toString(16));
         
         /*
          * Alice generates da randomly and Bob generates db randomly. These
@@ -114,13 +114,13 @@ public class ECDH {
         /*
          * Alice computes point da * qb and Bob computes point db * qa. These
          * should give the same result since 
-         * da * qb = da * db * G = db * da * G = db * qa
+         * s = da * qb = da * db * G = db * da * G = db * qa
          */
         BigInteger[] secretA = montgomeryLadder(qb, da, a, b, p);
         BigInteger[] secretB = montgomeryLadder(qa, db, a, b, p);
         
         /*
-         * This statement ensures the user that da * qb = db * qa, hence 
+         * This statement ensures the user that s = da * qb = db * qa, hence 
          * Alice and Bob have the same secret key.
          */
         if (secretA[0].equals(secretB[0]) && secretA[1].equals(secretB[1])) {

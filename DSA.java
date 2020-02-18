@@ -60,7 +60,7 @@ public class DSA {
      * implementation of DSA uses SHA-256.
      * 
      * Public:  (p, q, alpha, beta)
-     * Private: (a)
+     * Private: (a, k)
      * 
      * @param args not used
      * @throws NoSuchAlgorithmException non-issue (SHA-256 is defined)
@@ -161,7 +161,7 @@ public class DSA {
             BigInteger kInv = k.modInverse(q);
             BigInteger s = m.add(ar).multiply(kInv).mod(q);
             System.out.println("Signed message:");
-            System.out.println("m = " + m + " (" + message + ")");
+            System.out.println("m = " + m.toString(16) + " (" + message + ")");
             System.out.println("r = " + r.toString(16));
             System.out.println("s = " + s.toString(16));
             

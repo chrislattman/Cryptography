@@ -54,15 +54,15 @@ public class ECDSA {
     /**
      * The Elliptic Curve Digital Signature Algorithm (ECDSA).
      * 
-     * The curve used is secp256r1 using base point G = (x, y)
+     * The curve used is secp256r1 using base point g = (x, y)
      *                  
-     * y^2 = x^3 + a * x + b (mod p)
+     * y^2 = x^3 + ax + b (mod p)
      *                  
      * ECDSA uses a cryptographic hash function to produce a signature. This 
      * implementation of ECDSA uses SHA-256.
      *         
-     * Public:  (p, curve (a, b), G = (x, y), n)
-     * Private: (d)
+     * Public:  (p, curve (a, b), g = (x, y), n, q)
+     * Private: (d, k)
      * 
      * @param args not used
      * @throws NoSuchAlgorithmException non-issue (SHA-256 is defined)
@@ -79,13 +79,13 @@ public class ECDSA {
         BigInteger n = new BigInteger(order, 16);
         System.out.println("Public parameters for secp256r1");
         System.out.println("curve: y^2 = x^3 + ax + b (mod p), where:");
-        System.out.println("a = " + a);
-        System.out.println("b = " + b);
-        System.out.println("p = " + p);
-        System.out.println("with base point G = (x, y), where:");
-        System.out.println("x = " + x);
-        System.out.println("y = " + y);
-        System.out.println("and G has order " + n);
+        System.out.println("a = " + a.toString(16));
+        System.out.println("b = " + b.toString(16));
+        System.out.println("p = " + p.toString(16));
+        System.out.println("with base point g = (x, y), where:");
+        System.out.println("x = " + x.toString(16));
+        System.out.println("y = " + y.toString(16));
+        System.out.println("and g has order " + n.toString(16));
         
         /*
          * d is a private parameter chosen randomly
@@ -190,7 +190,7 @@ public class ECDSA {
             }
             
             System.out.println("Signed message:");
-            System.out.println("m = " + e + " (" + message + ")");
+            System.out.println("m = " + e.toString(16) + " (" + message + ")");
             System.out.println("r = " + r.toString(16));
             System.out.println("s = " + s.toString(16));
             
