@@ -12,7 +12,7 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Discrete Logarithm Integrated Encryption Scheme (IES) in pure Java. It
  * combines the Diffie-Hellman key exchange with AES, where the AES secret key
- * is generated with SHA-256.
+ * is generated using SHA-256.
  * 
  * Whenever setting up a cryptosystem that uses the Discrete Logarithm 
  * Problem, use a prime p of the form 4k + 3 that is also a safe prime 
