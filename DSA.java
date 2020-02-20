@@ -7,12 +7,12 @@ import java.security.SecureRandom;
 import java.util.Scanner;
 
 /**
- * Discrete Log Digital Signature Algorithm (DSA) in pure Java. It is based on
- * the ElGamal Signature Scheme.
+ * Discrete Logarithm Digital Signature Algorithm (DSA) in pure Java. It is 
+ * based on the ElGamal Signature Scheme.
  * 
- * Whenever setting up a cryptosystem that uses the Discrete Log Problem, use
- * a prime p of the form 4k + 3 that is also a safe prime (p = 2q + 1, q is 
- * also a prime).
+ * Whenever setting up a cryptosystem that uses the Discrete Logarithm 
+ * Problem, use a prime p of the form 4k + 3 that is also a safe prime 
+ * (p = 2q + 1, q is also a prime).
  * 
  * @author Chris Lattman
  */
@@ -101,7 +101,7 @@ public class DSA {
         System.out.println("beta = " + beta.toString(16));
         
         /*
-         * h is an instance of SHA-256, the cryptographic hash function used 
+         * h is an instance of SHA-256, the cryptographic hash function used
          * by DSA
          */
         MessageDigest h = MessageDigest.getInstance("SHA-256");
@@ -134,13 +134,13 @@ public class DSA {
             BigInteger m = new BigInteger(1, mbytes);
             
             /*
-             * k is chosen randomly and is in Z*_q, the group of multiplicative 
-             * inverses mod q
+             * k is chosen randomly and is in Z*_q, the group of 
+             * multiplicative inverses mod q
              * 
-             * If k is not in the acceptable range, a new value of k is chosen 
+             * If k is not in the acceptable range, a new value of k is chosen
              * until it falls in the valid range.
              * 
-             * It is crucial that k is generated randomly with each new 
+             * It is crucial that k is generated randomly with each new
              * signature. Otherwise DSA is susceptible to attack.
              */
             BigInteger k = new BigInteger(256, random);
@@ -161,12 +161,13 @@ public class DSA {
             BigInteger kInv = k.modInverse(q);
             BigInteger s = m.add(ar).multiply(kInv).mod(q);
             System.out.println("Signed message:");
-            System.out.println("m = " + m.toString(16) + " (" + message + ")");
+            System.out.println("m = " + m.toString(16) + 
+                " (" + message + ")");
             System.out.println("r = " + r.toString(16));
             System.out.println("s = " + s.toString(16));
             
             /*
-             * The following code verifies that the signed message provided is 
+             * The following code verifies that the signed message provided is
              * valid.
              * 
              * The verification process is as follows:

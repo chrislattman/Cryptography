@@ -78,11 +78,12 @@ public class RSA {
          * The following loop gives the user the opportunity to use the newly
          * created instance of RSA to encrypt or decrypt messages. 
          * 
-         * Messages are encoded using their byte sequences as specified by the 
+         * Messages are encoded using their byte sequences as specified by the
          * getBytes() String method. (UTF-8, the default charset, is used)
          */
         System.out.println();
-        System.out.print("Do you want to encrypt or decrypt a message? y/n: ");
+        System.out.print("Do you want to encrypt or decrypt a message? "
+            + "y/n: ");
         String answer = scanner.next().toLowerCase();
         while (answer.contains("y")) {
             System.out.print("Encrypt or decrypt? ");
@@ -93,7 +94,7 @@ public class RSA {
                 String plaintext = scanner.nextLine();
                 
                 /*
-                 * To encrypt a plaintext message, encode the message using 
+                 * To encrypt a plaintext message, encode the message using
                  * getBytes(). Call the encoded message theta. Compute 
                  * gamma = theta^e (mod n).
                  * 
@@ -110,7 +111,7 @@ public class RSA {
                 BigInteger gamma = new BigInteger(ciphertext, 16);
                 
                 /*
-                 * To decrypt an encoded ciphertext message (gamma), compute 
+                 * To decrypt an encoded ciphertext message (gamma), compute
                  * theta = gamma^d (mod n), then decode theta using the 
                  * toByteArray() BigInteger method to obtain the plaintext 
                  * message.

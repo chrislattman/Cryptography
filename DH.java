@@ -4,17 +4,18 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 /**
- * Dicrete Log Diffie-Hellman (DH) Key Exchange in pure Java.
+ * Dicrete Logarithm Diffie-Hellman (DH) Key Exchange in pure Java.
  * 
- * Whenever setting up a cryptosystem that uses the Discrete Log Problem, use
- * a prime p of the form 4k + 3 that is also a safe prime (p = 2q + 1, q is 
- * also a prime).
+ * Whenever setting up a cryptosystem that uses the Discrete Logarithm 
+ * Problem, use a prime p of the form 4k + 3 that is also a safe prime 
+ * (p = 2q + 1, q is also a prime).
  * 
  * DH is vulnerable to a man-in-the-middle attack. If Eve maintains two
  * separate key exchanges with Alice and Bob, she can intercept messages
- * sent between Alice and Bob, decrypting then re-encrypting messages. However,
- * Eve must always maintain these key exchanges; otherwise, her presence
- * becomes known to Alice and Bob. The STS Protocol mitigates such an attack.
+ * sent between Alice and Bob, decrypting then re-encrypting messages. 
+ * However, Eve must always maintain these key exchanges; otherwise, her 
+ * presence becomes known to Alice and Bob. The STS Protocol mitigates such
+ * an attack.
  * 
  * @author Chris Lattman
  */
@@ -55,7 +56,7 @@ public class DH {
         System.out.println("alpha = " + alpha.toString(16));
         
         /*
-         * Alice generates a randomly and Bob generates b randomly. These are 
+         * Alice generates a randomly and Bob generates b randomly. These are
          * both secret.
          * 
          * The range of a and b is [2, p - 2].
@@ -89,7 +90,7 @@ public class DH {
          * Alice would then compute h^a = (alpha^b)^a = alpha^(ab) (mod p).
          * Bob would compute g^b = (alpha^a)^b = alpha^(ab) (mod p).
          * 
-         * These two values are equal, and thus s = g^b (mod p) = h^a (mod p) 
+         * These two values are equal, and thus s = g^b (mod p) = h^a (mod p)
          * is the shared secret key.
          */
         BigInteger secretA = g.modPow(b, p);

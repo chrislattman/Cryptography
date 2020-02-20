@@ -10,9 +10,9 @@ import java.util.Scanner;
  * Schnorr Signature Scheme in pure Java. It is similar to DSA but the hash is
  * computed differently.
  * 
- * Whenever setting up a cryptosystem that uses the Discrete Log Problem, use
- * a prime p of the form 4k + 3 that is also a safe prime (p = 2q + 1, q is 
- * also a prime).
+ * Whenever setting up a cryptosystem that uses the Discrete Logarithm 
+ * Problem, use a prime p of the form 4k + 3 that is also a safe prime 
+ * (p = 2q + 1, q is also a prime).
  * 
  * @author Chris Lattman
  */
@@ -55,7 +55,7 @@ public class SchnorrSignature {
     /**
      * The Schnorr Signature Scheme.
      * 
-     * The public parameters p, q, and alpha are given above. Schnorr uses a 
+     * The public parameters p, q, and alpha are given above. Schnorr uses a
      * cryptographic hash function to produce a signed message. This 
      * implementation of Schnorr uses SHA-256.
      * 
@@ -84,7 +84,7 @@ public class SchnorrSignature {
          * The range of a is [2, q - 1] and a is in Z*_p, the group of 
          * multiplicative inverses mod p
          * 
-         * If a is not in the acceptable range, a new value for a is chosen 
+         * If a is not in the acceptable range, a new value for a is chosen
          * until it falls in the valid range.
          */
         SecureRandom random = new SecureRandom();
@@ -129,13 +129,13 @@ public class SchnorrSignature {
             BigInteger m = new BigInteger(mbytes);
             
             /*
-             * k is randomly chosen in Z*_q, the group of multiplicative 
+             * k is randomly chosen in Z*_q, the group of multiplicative
              * inverses mod q. It is a private parameter.
              * 
              * The range of k is [2, q - 1].
              * 
-             * If k is not in the acceptable range, a new value for k is chosen 
-             * until it falls in the valid range.
+             * If k is not in the acceptable range, a new value for k is 
+             * chosen until it falls in the valid range.
              * 
              * It is important to generate a new k, and thus s value for each
              * message. Otherwise Schnorr signatures is vulnerable to targeted
@@ -175,7 +175,7 @@ public class SchnorrSignature {
             System.out.println("s = " + s.toString(16));
             
             /*
-             * The following code verifies that the signed message provided is 
+             * The following code verifies that the signed message provided is
              * valid.
              * 
              * The verification condition is 
@@ -199,7 +199,7 @@ public class SchnorrSignature {
              * right "half" of the hash. Message m is shifted left to make 
              * room to be ORed, or concatenated, with righthalf. m is ORed 
              * with righthalf then hashed. The hash is set to BigInteger 
-             * rcheck, which is compared to r, calculated earlier, to verify 
+             * rcheck, which is compared to r, calculated earlier, to verify
              * the signature.
              */
             BigInteger alpha_s = alpha.modPow(s, p);

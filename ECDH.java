@@ -62,7 +62,7 @@ public class ECDH {
      */
     public static void main(String[] args) {
         /*
-         * Alice and Bob publicly agree to use the curve (a, b) with prime p 
+         * Alice and Bob publicly agree to use the curve (a, b) with prime p
          * and base point (x, y) with order n.
          */
         BigInteger a = new BigInteger(acoef, 16);
@@ -87,7 +87,7 @@ public class ECDH {
          * 
          * The range of da and db is [1, n - 1] (n is 256 bits long)
          * 
-         * If da or db are not in the acceptable range, new values of da and 
+         * If da or db are not in the acceptable range, new values of da and
          * db are chosen until they fall in the valid range.
          */
         SecureRandom random = new SecureRandom();
@@ -104,7 +104,7 @@ public class ECDH {
         /*
          * Alice's and Bob's public parameter qa and qb, respectively, are
          * generated using the Montgomery ladder with base point g and their 
-         * private parameters. Their public parameters are both points on the 
+         * private parameters. Their public parameters are both points on the
          * elliptic curve.
          */
         BigInteger[] g = {x, y};
@@ -120,7 +120,7 @@ public class ECDH {
         BigInteger[] secretB = montgomeryLadder(qa, db, a, b, p);
         
         /*
-         * This statement ensures the user that s = da * qb = db * qa, hence 
+         * This statement ensures the user that s = da * qb = db * qa, hence
          * Alice and Bob have the same secret key.
          */
         if (secretA[0].equals(secretB[0]) && secretA[1].equals(secretB[1])) {
@@ -239,7 +239,7 @@ public class ECDH {
      * @param p the prime field
      * @return 2 * point
      */
-    private static BigInteger[] pointDouble(BigInteger[] point, BigInteger a, 
+    private static BigInteger[] pointDouble(BigInteger[] point, BigInteger a,
         BigInteger b, BigInteger p) {
         /*
          * The (x, y) coordinates of the point

@@ -19,8 +19,8 @@ public class BBS {
     public static void main(String[] args) {
         /*
          * Primes p and q are chosen such that they are of the form 4k + 3,
-         * which means that the two rightmost (lowest-order) bits are set to 1.
-         * n = p * q
+         * which means that the two rightmost (lowest-order) bits should be 
+         * set to 1.
          */
         SecureRandom random = new SecureRandom();
         BigInteger p = BigInteger.probablePrime(512, random);

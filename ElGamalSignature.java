@@ -7,9 +7,9 @@ import java.util.Scanner;
 /**
  * ElGamal Signature Scheme in pure Java.
  * 
- * Whenever setting up a cryptosystem that uses the Discrete Log Problem, use
- * a prime p of the form 4k + 3 that is also a safe prime (p = 2q + 1, q is 
- * also a prime).
+ * Whenever setting up a cryptosystem that uses the Discrete Logarithm 
+ * Problem, use a prime p of the form 4k + 3 that is also a safe prime 
+ * (p = 2q + 1, q is also a prime).
  * 
  * @author Chris Lattman
  *
@@ -56,7 +56,7 @@ public class ElGamalSignature {
          * 
          * The range of a is [1, p - 2].
          * 
-         * If a is not in the acceptable range, a new value for a is chosen 
+         * If a is not in the acceptable range, a new value for a is chosen
          * until it falls in the valid range.
          */
         BigInteger a = new BigInteger(2048, random);
@@ -99,10 +99,10 @@ public class ElGamalSignature {
              * 
              * The range of k is [2, p - 2].
              * 
-             * If k is not in the acceptable range, a new value for k is chosen 
-             * until it falls in the valid range.
+             * If k is not in the acceptable range, a new value for k is 
+             * chosen until it falls in the valid range.
              * 
-             * Since k must be invertible under multiplication mod p - 1, it 
+             * Since k must be invertible under multiplication mod p - 1, it
              * suffices to choose k to be a probable prime less than p - 1.
              * 
              * It is important to generate a new k, and thus r value for each
@@ -134,7 +134,7 @@ public class ElGamalSignature {
             System.out.println("s = " + s.toString(16));
             
             /*
-             * The following code verifies that the signed message provided is 
+             * The following code verifies that the signed message provided is
              * valid.
              * 
              * Since s = k^(-1) * (ar - m) (mod p - 1), 

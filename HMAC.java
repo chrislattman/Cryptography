@@ -68,7 +68,7 @@ public class HMAC {
                 
                 /*
                  * Messages and keys are encoded using their byte sequences 
-                 * as specified by the getBytes() String method. (UTF-8, the 
+                 * as specified by the getBytes() String method. (UTF-8, the
                  * default charset, is used)
                  */
                 byte[] mbytes = message.getBytes();
@@ -140,7 +140,7 @@ public class HMAC {
                  * 
                  * where ^ is XOR and || is concatenation
                  * 
-                 * To break down the process, k_opad is the XORed k and opad 
+                 * To break down the process, k_opad is the XORed k and opad
                  * chunk whereas k_ipad is the XORed k and ipad chunk.
                  */
                 BigInteger k_opad = k.xor(opad);
@@ -148,7 +148,7 @@ public class HMAC {
                 
                 /*
                  * k_ipad is shifted left to give room to be ORed, or
-                 * concatenated, with message m. If the message's bit length 
+                 * concatenated, with message m. If the message's bit length
                  * isn't an even multiple of 4, extra 0s are padded to the 
                  * left. k_ipad is then ORed with m.
                  */
@@ -159,7 +159,7 @@ public class HMAC {
                 k_ipad = k_ipad.or(m);
                 
                 /*
-                 * k_ipad, now concatenated (ORed) with m, is hashed to give 
+                 * k_ipad, now concatenated (ORed) with m, is hashed to give
                  * the right "half" of the complete hash. It is then converted
                  * to a BigInteger for the next step.
                  */
@@ -174,7 +174,8 @@ public class HMAC {
                  */
                 k_opad = k_opad.shiftLeft(righthalf.bitLength());
                 if (righthalf.bitLength() % 4 != 0) {
-                    k_opad = k_opad.shiftLeft(4 - (righthalf.bitLength() % 4));
+                    k_opad = k_opad.shiftLeft(4 - 
+                        (righthalf.bitLength() % 4));
                 }
                 k_opad = k_opad.or(righthalf);
                 

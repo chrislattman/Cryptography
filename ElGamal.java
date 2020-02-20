@@ -8,9 +8,9 @@ import java.util.Scanner;
  * ElGamal cryptosystem in pure Java. It is based on the Diffie-Hellman
  * key exchange.
  * 
- * Whenever setting up a cryptosystem that uses the Discrete Log Problem, use
- * a prime p of the form 4k + 3 that is also a safe prime (p = 2q + 1, q is 
- * also a prime).
+ * Whenever setting up a cryptosystem that uses the Discrete Logarithm 
+ * Problem, use a prime p of the form 4k + 3 that is also a safe prime 
+ * (p = 2q + 1, q is also a prime).
  * 
  * @author Chris Lattman
  */
@@ -80,7 +80,8 @@ public class ElGamal {
          */
         Scanner scanner = new Scanner(System.in);
         System.out.println();
-        System.out.print("Do you want to encrypt or decrypt a message? y/n: ");
+        System.out.print("Do you want to encrypt or decrypt a message? "
+            + "y/n: ");
         String answer = scanner.next().toLowerCase();
         while (answer.contains("y")) {
             System.out.print("Encrypt or decrypt? ");

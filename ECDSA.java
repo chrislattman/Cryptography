@@ -7,7 +7,7 @@ import java.security.SecureRandom;
 import java.util.Scanner;
 
 /**
- * Elliptic-Curve Digital Signature Algorithm (ECDSA) in pure Java.
+ * Elliptic Curve Digital Signature Algorithm (ECDSA) in pure Java.
  * 
  * This implementation of ECDSA uses secp256r1, and the public parameters
  * below were taken from https://www.secg.org/SEC2-Ver-1.0.pdf
@@ -58,7 +58,7 @@ public class ECDSA {
      *                  
      * y^2 = x^3 + ax + b (mod p)
      *                  
-     * ECDSA uses a cryptographic hash function to produce a signature. This 
+     * ECDSA uses a cryptographic hash function to produce a signature. This
      * implementation of ECDSA uses SHA-256.
      *         
      * Public:  (p, curve (a, b), g = (x, y), n, q)
@@ -109,7 +109,7 @@ public class ECDSA {
         BigInteger[] q = montgomeryLadder(g, d, a, b, p);
         
         /*
-         * h is an instance of SHA-256, the cryptographic hash function used 
+         * h is an instance of SHA-256, the cryptographic hash function used
          * by ECDSA
          */
         MessageDigest h = MessageDigest.getInstance("SHA-256");
@@ -131,7 +131,7 @@ public class ECDSA {
              * encoded using the getBytes() String method (UTF-8).
              * 
              * The hash function is used to create a digest, or hash of the
-             * encoded message. The hash itself is a byte array, which is 
+             * encoded message. The hash itself is a byte array, which is
              * converted to an integer.
              */
             System.out.print("Enter a message to be signed: ");
@@ -148,10 +148,10 @@ public class ECDSA {
                 /*
                  * k is chosen randomly and is in the range [1, n - 1]
                  * 
-                 * If k is not in the acceptable range, a new value of k is 
+                 * If k is not in the acceptable range, a new value of k is
                  * chosen until it falls in the valid range.
                  * 
-                 * It is crucial that k is generated randomly with each new 
+                 * It is crucial that k is generated randomly with each new
                  * signature. Otherwise ECDSA is susceptible to attack.
                  */
                 BigInteger k = new BigInteger(n.bitLength(), random);
@@ -190,14 +190,15 @@ public class ECDSA {
             }
             
             System.out.println("Signed message:");
-            System.out.println("m = " + e.toString(16) + " (" + message + ")");
+            System.out.println("m = " + e.toString(16) + 
+                " (" + message + ")");
             System.out.println("r = " + r.toString(16));
             System.out.println("s = " + s.toString(16));
             
             
             /*
-             * The following code verifies that the signature provided is 
-             * a valid signature.
+             * The following code verifies that the signed message provided is 
+             * valid.
              * 
              * Checking that q is a valid curve point:
              * 
@@ -376,7 +377,7 @@ public class ECDSA {
      * @param p the prime field
      * @return 2 * point
      */
-    private static BigInteger[] pointDouble(BigInteger[] point, BigInteger a, 
+    private static BigInteger[] pointDouble(BigInteger[] point, BigInteger a,
         BigInteger b, BigInteger p) {
         /*
          * The (x, y) coordinates of the point

@@ -14,7 +14,7 @@ import java.util.Scanner;
  * The second scheme, RSA blind signatures, signs a message without knowing
  * the message's contents.
  * 
- * The third scheme, RSA-SHA, signs messages like RSA signatures but uses the 
+ * The third scheme, RSA-SHA, signs messages like RSA signatures but uses the
  * SHA-256 cryptographic hash function.
  * 
  * @author Chris Lattman
@@ -64,12 +64,12 @@ public class RSASignature {
     }
 
     /**
-     * In all instances of RSA signatures, primes p and q are chosen and kept 
+     * In all instances of RSA signatures, primes p and q are chosen and kept
      * private, as well as d and phi(n), whereas n and e are published.
      * 
      * RSA-SHA simply applies a hash function to the encoded message.
      * 
-     * RSA blind signatures apply a mask to a message so that the owner of the 
+     * RSA blind signatures apply a mask to a message so that the owner of the
      * cryptosystem cannot read the plaintext message, but can still sign it.
      * 
      * Public:  (n, e)
@@ -99,7 +99,7 @@ public class RSASignature {
         }
         else {
             /*
-             * Two distinct 1024-bit probable primes are chosen. In the rare 
+             * Two distinct 1024-bit probable primes are chosen. In the rare
              * case that p = q, a new prime q is chosen until they are no 
              * longer equal.
              */
@@ -155,11 +155,11 @@ public class RSASignature {
         BigInteger y;
         if (blind) {
             /*
-             * Say Alice set up the above instance of RSA signatures. Bob wants
-             * Alice to sign a masked message. He chooses random k in Z*_n, the 
-             * group of multiplicative inverses mod n.
+             * Say Alice set up the above instance of RSA signatures. Bob 
+             * wants Alice to sign a masked message. He chooses random k in 
+             * Z*_n, the group of multiplicative inverses mod n.
              * 
-             * Since k must be invertible under multiplication mod n, it 
+             * Since k must be invertible under multiplication mod n, it
              * suffices to choose k to be a probable prime less than n.
              */
             BigInteger k = BigInteger.probablePrime(2048, random);
@@ -168,7 +168,7 @@ public class RSASignature {
             }
             
             /*
-             * The mask is t = k^e (mod n). Bob sends z = m * t (mod n) to 
+             * The mask is t = k^e (mod n). Bob sends z = m * t (mod n) to
              * Alice.
              */
             BigInteger t = k.modPow(e, n);
@@ -185,7 +185,7 @@ public class RSASignature {
             
             /*
              * Bob computes y = w * k^(-1) (mod n). This gives 
-             * y = z^d * k^(-1) = m^d * k * k^(-1) = m^d (mod n), the valid 
+             * y = z^d * k^(-1) = m^d * k * k^(-1) = m^d (mod n), the valid
              * signature.
              */
             BigInteger kInv = k.modInverse(n);
@@ -206,7 +206,7 @@ public class RSASignature {
         System.out.println("y = " + y.toString(16));
         
         /*
-         * The following code verifies that the signed message provided is 
+         * The following code verifies that the signed message provided is
          * valid.
          * 
          * The receiver of the signed message checks that y^e = m (mod n).
