@@ -258,7 +258,7 @@ public class ECDH {
          * x2 = alpha^2 - 2x (mod p) and
          * y2 = alpha * (x - x2) - y (mod p), where
          * 
-         * alpha = (3 * x + a) / (2 * y) (mod p)
+         * alpha = (3x^2 + a) / (2y) (mod p)
          */
         BigInteger three = new BigInteger("3");
         BigInteger three_xsquared_a = three.multiply(x.pow(2)).add(a);
