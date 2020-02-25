@@ -62,6 +62,9 @@ public class IES {
         System.out.println("alpha = " + alpha.toString(16));
         
         /*
+         * In this example, Alice sends a message to Bob, who set up this
+         * instance of IES.
+         * 
          * Alice generates a randomly and Bob generates b randomly. These are
          * both secret.
          * 

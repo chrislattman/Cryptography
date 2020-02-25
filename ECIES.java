@@ -1,17 +1,24 @@
 package crypto;
 
 import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.Scanner;
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Elliptic Curve Diffie-Hellman (ECDH) Key Exchange in pure Java.
+ * Elliptic Curve Integrated Encryption Scheme (ECIES) in pure Java.
  * 
- * This implementation of ECDH uses secp256r1, and the public parameters
+ * This implementation of ECIES uses secp256r1, and the public parameters
  * below were taken from https://www.secg.org/SEC2-Ver-1.0.pdf
  * 
  * @author Chris Lattman
  */
-public class ECDH {
+public class ECIES {
     /*
      * The secp256r1 'a' coefficient.
      */
@@ -49,7 +56,7 @@ public class ECDH {
         + "A7179E84F3B9CAC2FC632551";
 
     /**
-     * The Elliptic Curve Diffie-Hellman (ECDH) key exchange.
+     * The Elliptic Curve Integrated Encryption Scheme (ECIES).
      * 
      * The curve used is secp256r1 using base point g = (x, y)
      *                  
@@ -59,8 +66,10 @@ public class ECDH {
      * Private: (da, db, s)
      * 
      * @param args not used
+     * @throws Exception a whole host of exceptions can be thrown, although
+     *                   they are all non-issues in this implementation
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         /*
          * Alice and Bob publicly agree to use the curve (a, b) with prime p
          * and base point (x, y) with order n.
@@ -82,6 +91,9 @@ public class ECDH {
         System.out.println("and g has order " + n.toString(16));
         
         /*
+         * In this example, Alice sends a message to Bob, who set up this
+         * instance of ECIES.
+         * 
          * Alice generates da randomly and Bob generates db randomly. These
          * are both private.
          * 
@@ -116,26 +128,102 @@ public class ECDH {
             qb[1].toString(16) + ")");
         
         /*
-         * Alice computes point da * qb and Bob computes point db * qa. These
-         * should give the same result since 
-         * s = da * qb = da * db * G = db * da * G = db * qa
+         * Alice computes shared secret point da * qb = da * db * g. Bob can 
+         * also compute this shared secret by computing db * qa = db * da * g.
          */
-        BigInteger[] secretA = montgomeryLadder(qb, da, a, b, p);
-        BigInteger[] secretB = montgomeryLadder(qa, db, a, b, p);
+        BigInteger[] secret = montgomeryLadder(qb, da, a, b, p);
         
         /*
-         * This statement ensures the user that s = da * qb = db * qa, hence
-         * Alice and Bob have the same secret key.
+         * hash is an instance of SHA-512, the cryptographic hash function 
+         * used by ECIES
+         * 
+         * hmac is an instance of HMAC_SHA-256, the MAC function used to
+         * verify data integrity
          */
-        if (secretA[0].equals(secretB[0]) && secretA[1].equals(secretB[1])) {
-            System.out.println("da * qb = db * qa");
+        MessageDigest hash = MessageDigest.getInstance("SHA-512");
+        Mac hmac = Mac.getInstance("HmacSHA256");
+        
+        /*
+         * Alice computes the secret keys for AES and HMAC by hashing the 
+         * shared secret = db * da * g. Bob can do the same, since he knows 
+         * the shared secret as well.
+         * 
+         * The shared secret is hashed by concatenating the coordinates of
+         * the secret key. The output represents two keys since the leftmost 
+         * 256 bits are the encryption key and the rightmost 256 bits are 
+         * the HMAC key.
+         */
+        BigInteger concat = secret[0].shiftLeft(secret[1].bitLength());
+        concat = concat.or(secret[1]);
+        byte[] kbytes = hash.digest(concat.toByteArray());
+        byte[] enckeybytes = new byte[32];
+        byte[] mackeybytes = new byte[32];
+        for (int i = 0; i < 32; i++) {
+            enckeybytes[i] = kbytes[i];
         }
-        else {
-            // the following line should never be called
-            System.out.println("da * qb =/= db * qa");
+        for (int j = 0; j < 32; j++) {
+            mackeybytes[j] = kbytes[j + 32];
         }
+        SecretKeySpec enck = new SecretKeySpec(enckeybytes, "AES");
+        SecretKeySpec mack = new SecretKeySpec(mackeybytes, "HmacSHA256");
+        
+        /*
+         * This is the message to be sent from Alice to Bob.
+         */
+        System.out.print("Enter the message for Alice to encrypt: ");
+        Scanner scanner = new Scanner(System.in);
+        String message = scanner.nextLine();
+        scanner.close();
+        
+        /*
+         * cipher is an instance of 256-bit AES with CBC mode and PKCS5 
+         * padding, the block cipher used by IES
+         * 
+         * It is initialized to encrypt data using the secret key k and an
+         * initialization vector iv of {0} for AES's CBC mode.
+         */
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        byte[] iv = new byte[16];
+        IvParameterSpec ivspec = new IvParameterSpec(iv);
+        cipher.init(Cipher.ENCRYPT_MODE, enck, ivspec);
+        
+        /*
+         * HMAC is initialized with the mac key
+         */
+        hmac.init(mack);
+        
+        /*
+         * The message is encrypted with AES, and the ciphertext is hashed
+         * using HMAC.
+         * 
+         * The Base64 class is used because there are sometimes issues when 
+         * using BigInteger's toByteArray() method to decode messages that 
+         * were encrypted using the AES cipher, e.g. wrong byte array lengths.
+         */
+        byte[] ciphertextbytes = cipher.doFinal(message.getBytes());
+        byte[] tagbytes = hmac.doFinal(ciphertextbytes);
+        String ciphertext = Base64.getEncoder().encodeToString(
+            ciphertextbytes);
+        String tag = Base64.getEncoder().encodeToString(tagbytes);
+        String output = qa[0].toString(16) + qa[1].toString(16) + ciphertext 
+            + tag;
+        System.out.println("qa||ciphertext||tag: " + output);
+        
+        /*
+         * Bob then decrypts the message using the secret keys and the 
+         * initialization vector iv (which were generated earlier). Bob can
+         * generate the secret keys because he knows the shared secret point.
+         * (This calculation was done above earlier.)
+         * 
+         * Here, the same block cipher is reused for decryption.
+         */
+        cipher.init(Cipher.DECRYPT_MODE, enck, ivspec);
+        byte[] cipherbytes = Base64.getDecoder().decode(ciphertext);
+        byte[] plaintextbytes = cipher.doFinal(cipherbytes);
+        String plaintext = new String(plaintextbytes);
+        System.out.println("Plaintext: " + plaintext);
     }
-    
+
     /**
      * The Montgomery ladder implementation. It takes no extra
      * computational time, and provides security against side-channel

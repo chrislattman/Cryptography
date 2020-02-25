@@ -107,6 +107,8 @@ public class ECDSA {
          */
         BigInteger[] g = {x, y};
         BigInteger[] q = montgomeryLadder(g, d, a, b, p);
+        System.out.println("q = (" + q[0].toString(16) + ", " + 
+            q[1].toString(16) + ")");
         
         /*
          * h is an instance of SHA-256, the cryptographic hash function used

@@ -46,7 +46,6 @@ public class ElGamal {
          */
         BigInteger p = new BigInteger(prime, 16);
         BigInteger alpha = BigInteger.TWO;
-        SecureRandom random = new SecureRandom();
         System.out.println("Public parameters:");
         System.out.println("p = " + p.toString(16));
         System.out.println("alpha = " + alpha.toString(16));
@@ -59,6 +58,7 @@ public class ElGamal {
          * If b is not in the acceptable range, a new value for b is chosen 
          * until it falls in the valid range.
          */
+        SecureRandom random = new SecureRandom();
         BigInteger b = new BigInteger(2048, random);
         while (b.compareTo(BigInteger.TWO) < 0 ||
                b.compareTo(p.subtract(BigInteger.TWO)) > 0) {
