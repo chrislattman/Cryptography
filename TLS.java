@@ -20,7 +20,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class TLS {
     /**
-     * A basic TLS session without a certificate authority.
+     * A basic TLS session without a trusted certificate authority.
      * 
      * @param args not used
      * @throws Exception
@@ -30,6 +30,11 @@ public class TLS {
          * The client and the server initiate the session by introducing
          * themselves. I know this is idiotic; I'm just trying to follow 
          * protocol here.
+         * 
+         * In real TLS, this is where the client and the server agree upon
+         * what encryption schemes are used. This implementation chooses
+         * ECDSA to sign the public key, AES to share the master secret, and
+         * SHA-512 to generate the two secret encryption and HMAC keys.
          */
         System.out.println("Hi server, I'm the client.");
         System.out.println("Hi client, I'm the server.");
@@ -62,7 +67,7 @@ public class TLS {
         /*
          * The signed public key is then verified by the client. If it
          * verifies, the client generates a master secret and encrypts it with
-         * AES with the server's public key as the AES "secret" key.
+         * AES, using the server's public key as the AES key.
          */
         ecSign.initVerify(keyPair.getPublic());
         ecSign.update(publicKey.toByteArray());
@@ -123,6 +128,11 @@ public class TLS {
             /*
              * The encryption key and HMAC keys are printed for demonstration 
              * only. This should NEVER be done in practice.
+             * 
+             * In real TLS, ciphertexts are sent between the client and the
+             * server (encrypted with these secret keys) to verify that they
+             * share the same keys. If successful, all future communications
+             * between them during the session are encrypted using these keys.
              */
             System.out.println("shared encryption key: " + 
                 encrypt.toString(16));
