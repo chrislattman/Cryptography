@@ -23,7 +23,8 @@ public class TLS {
      * A basic TLS session without a trusted certificate authority.
      * 
      * @param args not used
-     * @throws Exception
+     * @throws Exception a whole host of exceptions can be thrown, although
+     *                   they are all non-issues in this implementation
      */
     public static void main(String[] args) throws Exception {
         /*
