@@ -95,7 +95,8 @@ public class ElGamalSignature {
             
             /*
              * k is randomly chosen in Z*_p-1, the group of multiplicative 
-             * inverses mod p - 1. It is a private parameter.
+             * inverses mod p - 1. Therefore k is relatively prime to p - 1.
+             * It is a private parameter.
              * 
              * The range of k is [2, p - 2].
              * 
@@ -164,5 +165,4 @@ public class ElGamalSignature {
         }
         scanner.close();
     }
-
 }

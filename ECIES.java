@@ -196,9 +196,7 @@ public class ECIES {
          * The message is encrypted with AES, and the ciphertext is hashed
          * using HMAC.
          * 
-         * The Base64 class is used because there are sometimes issues when 
-         * using BigInteger's toByteArray() method to decode messages that 
-         * were encrypted using the AES cipher, e.g. wrong byte array lengths.
+         * The Base64 class is used due to padding.
          */
         byte[] ciphertextbytes = cipher.doFinal(message.getBytes());
         byte[] tagbytes = hmac.doFinal(ciphertextbytes);
@@ -237,7 +235,7 @@ public class ECIES {
      * @param a the curve parameter A
      * @param b the curve parameter B
      * @param p the prime field
-     * @return the scalar product d * point
+     * @return the scalar product d * point, a Cartesian coordinate
      */
     private static BigInteger[] montgomeryLadder(BigInteger[] point, 
         BigInteger d, BigInteger a, BigInteger b, BigInteger p) {
@@ -267,7 +265,7 @@ public class ECIES {
      * @param a the curve parameter A
      * @param b the curve parameter B
      * @param p the prime field
-     * @return point1 + point2
+     * @return point1 + point2, a Cartesian coordinate
      */
     private static BigInteger[] pointAdd(BigInteger[] point1, 
         BigInteger[] point2, BigInteger a, BigInteger b, BigInteger p) {
@@ -329,7 +327,7 @@ public class ECIES {
      * @param a the curve parameter A
      * @param b the curve parameter B
      * @param p the prime field
-     * @return 2 * point
+     * @return 2 * point, a Cartesian coordinate
      */
     private static BigInteger[] pointDouble(BigInteger[] point, BigInteger a,
         BigInteger b, BigInteger p) {

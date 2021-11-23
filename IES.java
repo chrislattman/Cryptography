@@ -139,9 +139,7 @@ public class IES {
          * The message is encrypted with AES and sent to Bob in ciphertext 
          * base64.
          * 
-         * The Base64 class is used because there are sometimes issues when 
-         * using BigInteger's toByteArray() method to decode messages that 
-         * were encrypted using the AES cipher, e.g. wrong byte array lengths.
+         * The Base64 class is used due to padding.
          */
         byte[] ciphertextbytes = cipher.doFinal(message.getBytes());
         String base64 = Base64.getEncoder().encodeToString(ciphertextbytes);

@@ -81,8 +81,8 @@ public class SchnorrSignature {
         /*
          * a is a private parameter chosen randomly
          * 
-         * The range of a is [2, q - 1] and a is in Z*_p, the group of 
-         * multiplicative inverses mod p
+         * The range of a is [2, q - 1] and a is (by default) relative prime
+         * to p.
          * 
          * If a is not in the acceptable range, a new value for a is chosen
          * until it falls in the valid range.
@@ -129,8 +129,7 @@ public class SchnorrSignature {
             BigInteger m = new BigInteger(mbytes);
             
             /*
-             * k is randomly chosen in Z*_q, the group of multiplicative
-             * inverses mod q. It is a private parameter.
+             * k is chosen randomly and is relatively prime to q
              * 
              * The range of k is [2, q - 1].
              * 

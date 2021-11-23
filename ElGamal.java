@@ -162,5 +162,4 @@ public class ElGamal {
         }
         scanner.close();
     }
-
 }

@@ -108,5 +108,4 @@ public class DH {
             System.out.println("g^b (mod p) =/= h^a (mod p)");
         }
     }
-
 }

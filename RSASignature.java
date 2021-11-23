@@ -39,7 +39,8 @@ public class RSASignature {
             System.out.print("Enter the number of the signature scheme you "
                 + "would like to use: ");
             try {
-                int scheme = scanner.nextInt();
+                String schemeInput = scanner.next().replaceAll("[^0-9]", "");
+                int scheme = Integer.parseInt(schemeInput);
                 if (scheme == 1) {
                     rsaSignatures(scanner, false, false);
                 }
@@ -156,8 +157,8 @@ public class RSASignature {
         if (blind) {
             /*
              * Say Alice set up the above instance of RSA signatures. Bob 
-             * wants Alice to sign a masked message. He chooses random k in 
-             * Z*_n, the group of multiplicative inverses mod n.
+             * wants Alice to sign a masked message. He chooses random k that
+             * is relatively prime to n.
              * 
              * Since k must be invertible under multiplication mod n, it
              * suffices to choose k to be a probable prime less than n.
@@ -209,7 +210,7 @@ public class RSASignature {
          * The following code verifies that the signed message provided is
          * valid.
          * 
-         * The receiver of the signed message checks that y^e = m (mod n).
+         * The receiver of the signed message checks that m = y^e (mod n).
          * 
          * Existential forgeries are possible by choosing any y, computing
          * m = y^e (mod n), and publishing (m, y), which verifies. However,
@@ -221,7 +222,7 @@ public class RSASignature {
          * probability of z being a meaningful message rather than random 
          * noise is negligible.
          */
-        if (y.modPow(e, n).equals(m.mod(n))) {
+        if (m.equals(y.modPow(e, n))) {
             System.out.println("Signature is verified.");
         }
         else {

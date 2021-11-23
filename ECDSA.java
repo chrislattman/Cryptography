@@ -277,7 +277,7 @@ public class ECDSA {
      * computational time, and provides security against side-channel
      * attacks that use power analysis.
      * 
-     * Special thanks to kekalaka for their explanation:
+     * Special thanks to kelalaka for their explanation:
      * https://crypto.stackexchange.com/a/75879
      * 
      * @param point the curve point to be added to itself
@@ -285,7 +285,7 @@ public class ECDSA {
      * @param a the curve parameter A
      * @param b the curve parameter B
      * @param p the prime field
-     * @return the scalar product d * point
+     * @return the scalar product d * point, a Cartesian coordinate
      */
     private static BigInteger[] montgomeryLadder(BigInteger[] point, 
         BigInteger d, BigInteger a, BigInteger b, BigInteger p) {
@@ -315,7 +315,7 @@ public class ECDSA {
      * @param a the curve parameter A
      * @param b the curve parameter B
      * @param p the prime field
-     * @return point1 + point2
+     * @return point1 + point2, a Cartesian coordinate
      */
     private static BigInteger[] pointAdd(BigInteger[] point1, 
         BigInteger[] point2, BigInteger a, BigInteger b, BigInteger p) {
@@ -377,7 +377,7 @@ public class ECDSA {
      * @param a the curve parameter A
      * @param b the curve parameter B
      * @param p the prime field
-     * @return 2 * point
+     * @return 2 * point, a Cartesian coordinate
      */
     private static BigInteger[] pointDouble(BigInteger[] point, BigInteger a,
         BigInteger b, BigInteger p) {
