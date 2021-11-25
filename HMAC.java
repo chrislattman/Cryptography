@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.util.Scanner;
 
 /**
- * HMAC message authentication code in pure Java.
+ * Hash-based Message Authentication Code (HMAC) in pure Java.
  * 
  * @author Chris Lattman
  */

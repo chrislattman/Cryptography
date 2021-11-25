@@ -118,8 +118,8 @@ public class IES {
         /*
          * This is the message to be sent from Alice to Bob.
          */
-        System.out.print("Enter the message for Alice to encrypt: ");
         Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the message for Alice to encrypt: ");
         String message = scanner.nextLine();
         scanner.close();
         
@@ -157,5 +157,4 @@ public class IES {
         String plaintext = new String(plaintextbytes);
         System.out.println("Plaintext: " + plaintext);
     }
-
 }

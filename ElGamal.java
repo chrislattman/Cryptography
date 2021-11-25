@@ -51,7 +51,7 @@ public class ElGamal {
         System.out.println("alpha = " + alpha.toString(16));
         
         /*
-         * a is a private parameter chosen randomly such that 1 < a < q
+         * b is randomly chosen. It is a private parameter.
          * 
          * The range of b is [2, p - 2].
          * 

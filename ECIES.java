@@ -170,8 +170,8 @@ public class ECIES {
         /*
          * This is the message to be sent from Alice to Bob.
          */
-        System.out.print("Enter the message for Alice to encrypt: ");
         Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the message for Alice to encrypt: ");
         String message = scanner.nextLine();
         scanner.close();
         
@@ -227,7 +227,7 @@ public class ECIES {
      * computational time, and provides security against side-channel
      * attacks that use power analysis.
      * 
-     * Special thanks to kekalaka for their explanation:
+     * Special thanks to kelalaka for their explanation:
      * https://crypto.stackexchange.com/a/75879
      * 
      * @param point the curve point to be added to itself

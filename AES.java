@@ -3,7 +3,7 @@ package crypto;
 import java.util.Scanner;
 
 /**
- * Advanced Encryption Standard block cipher in pure Java.
+ * Advanced Encryption Standard (AES) block cipher in pure Java.
  * 
  * This AES implementation is a command line interface for text-based 
  * plaintexts. The S-box and the powers of x in the AES field are hard-coded.

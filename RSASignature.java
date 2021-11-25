@@ -22,7 +22,7 @@ import java.util.Scanner;
 public class RSASignature {
     
     /**
-     * Where the three signature schemes are called from.
+     * Entry function for RSA signature functions.
      * 
      * @param args not used
      */
@@ -70,8 +70,9 @@ public class RSASignature {
      * 
      * RSA-SHA simply applies a hash function to the encoded message.
      * 
-     * RSA blind signatures apply a mask to a message so that the owner of the
-     * cryptosystem cannot read the plaintext message, but can still sign it.
+     * RSA blind signatures applies a mask to a message so that the owner of
+     * the cryptosystem cannot read the plaintext message, but can still sign
+     * it.
      * 
      * Public:  (n, e)
      * Private: (p, q, d, phi(n))
@@ -85,11 +86,11 @@ public class RSASignature {
         boolean blind) throws NoSuchAlgorithmException {
         System.out.print("Would like you use custom primes, i.e. "
             + "Sophie Germain/safe primes? y/n: ");
-        String yesno = scanner.next().toLowerCase();
+        String answer = scanner.next().toLowerCase();
         SecureRandom random = new SecureRandom();
         BigInteger p, q;
         
-        if (yesno.contains("y")) {
+        if (answer.contains("y")) {
             System.out.println("Enter p and q (in hex):");
             System.out.print("p: ");
             String prime_p = scanner.next();
@@ -161,11 +162,12 @@ public class RSASignature {
              * is relatively prime to n.
              * 
              * Since k must be invertible under multiplication mod n, it
-             * suffices to choose k to be a probable prime less than n.
+             * suffices to choose k to be a random number less than n not
+             * equal to p or q.
              */
-            BigInteger k = BigInteger.probablePrime(2048, random);
-            while (k.compareTo(n) >= 0) {
-                k = BigInteger.probablePrime(2048, random);
+            BigInteger k = new BigInteger(2048, random);
+            while (k.compareTo(n) >= 0 || k.equals(p) || k.equals(q)) {
+                k = new BigInteger(2048, random);
             }
             
             /*

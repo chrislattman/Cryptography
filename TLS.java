@@ -13,8 +13,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * A rudimentary TLS session in pure Java, as described on p.462 of
- * Cryptography: Theory and Practice, 4th Edition (2019).
+ * A rudimentary Transport Layer Security (TLS) session in pure Java, as
+ * described on p.462 of Cryptography: Theory and Practice, 4th Edition (2019).
  * 
  * @author Chris Lattman
  */
@@ -143,5 +143,4 @@ public class TLS {
             System.out.println("Signature is not verified.");
         }
     }
-
 }

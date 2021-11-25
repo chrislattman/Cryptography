@@ -79,10 +79,9 @@ public class SchnorrSignature {
         System.out.println("alpha = " + alpha.toString(16));
         
         /*
-         * a is a private parameter chosen randomly
+         * a is a private parameter chosen randomly.
          * 
-         * The range of a is [2, q - 1] and a is (by default) relative prime
-         * to p.
+         * The range of a is [2, q - 1].
          * 
          * If a is not in the acceptable range, a new value for a is chosen
          * until it falls in the valid range.
@@ -129,9 +128,10 @@ public class SchnorrSignature {
             BigInteger m = new BigInteger(mbytes);
             
             /*
-             * k is chosen randomly and is relatively prime to q
+             * k is a private parameter chosen randomly.
              * 
-             * The range of k is [2, q - 1].
+             * The range of k is [1, q - 1]. By default, k is relatively prime
+             * to q.
              * 
              * If k is not in the acceptable range, a new value for k is 
              * chosen until it falls in the valid range.
@@ -142,8 +142,7 @@ public class SchnorrSignature {
              * attacker to compute s for any message with random k.
              */
             BigInteger k = new BigInteger(256, random);
-            while (k.compareTo(BigInteger.TWO) < 0 ||
-                   k.compareTo(p.subtract(BigInteger.TWO)) > 0) {
+            while (k.compareTo(BigInteger.ONE) < 0 || k.compareTo(q) >= 0) {
                 k = new BigInteger(256, random);
             }
             
@@ -222,5 +221,4 @@ public class SchnorrSignature {
         }
         scanner.close();
     }
-
 }

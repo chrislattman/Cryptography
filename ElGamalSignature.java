@@ -51,19 +51,15 @@ public class ElGamalSignature {
         System.out.println("alpha = " + alpha.toString(16));
         
         /*
-         * a is randomly chosen. It is a private parameter.
+         * a is randomly chosen in Z mod p-1, the group of multiplicative 
+         * inverses mod p - 1. Therefore a is relatively prime to p - 1.
+         * It is a private parameter.
          * 
-         * The range of a is [1, p - 2].
-         * 
-         * If a is not in the acceptable range, a new value for a is chosen
-         * until it falls in the valid range.
+         * Since a must be invertible under multiplication mod p - 1, it
+         * suffices to choose k to be a probable prime less than p - 1.
          */
         SecureRandom random = new SecureRandom();
-        BigInteger a = new BigInteger(2048, random);
-        while (a.compareTo(BigInteger.ONE) < 0 ||
-               a.compareTo(p.subtract(BigInteger.TWO)) > 0) {
-            a = new BigInteger(2048, random);
-        }
+        BigInteger a = BigInteger.probablePrime(1024, random);
         
         /*
          * Compute beta = alpha^a (mod p). This is a public parameter.
@@ -94,14 +90,9 @@ public class ElGamalSignature {
             BigInteger m = new BigInteger(mbytes);
             
             /*
-             * k is randomly chosen in Z*_p-1, the group of multiplicative 
+             * k is randomly chosen in Z mod p-1, the group of multiplicative 
              * inverses mod p - 1. Therefore k is relatively prime to p - 1.
              * It is a private parameter.
-             * 
-             * The range of k is [2, p - 2].
-             * 
-             * If k is not in the acceptable range, a new value for k is 
-             * chosen until it falls in the valid range.
              * 
              * Since k must be invertible under multiplication mod p - 1, it
              * suffices to choose k to be a probable prime less than p - 1.
@@ -111,11 +102,7 @@ public class ElGamalSignature {
              * forgeries by revealing a, the private parameter. This allows an
              * attacker to compute s for any message with random k.
              */
-            BigInteger k = BigInteger.probablePrime(2048, random);
-            while (k.compareTo(BigInteger.TWO) < 0 ||
-                   k.compareTo(p.subtract(BigInteger.TWO)) > 0) {
-                k = BigInteger.probablePrime(2048, random);
-            }
+            BigInteger k = BigInteger.probablePrime(1024, random);
             
             /*
              * r, the first signature value, is computed as 

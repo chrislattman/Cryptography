@@ -28,16 +28,15 @@ public class RSA {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Would like you use custom primes, i.e. Sophie "
             + "Germain/safe primes? y/n: ");
-        String yesno = scanner.next().toLowerCase();
+        String answer = scanner.next().toLowerCase();
         BigInteger p, q;
         
-        if (yesno.contains("y")) {
+        if (answer.contains("y")) {
             System.out.println("Enter p and q (in hex):");
             System.out.print("p: ");
             String prime_p = scanner.next();
             System.out.print("q: ");
             String prime_q = scanner.next();
-            
             p = new BigInteger(prime_p, 16);
             q = new BigInteger(prime_q, 16);
         }
@@ -84,7 +83,7 @@ public class RSA {
         System.out.println();
         System.out.print("Do you want to encrypt or decrypt a message? "
             + "y/n: ");
-        String answer = scanner.next().toLowerCase();
+        answer = scanner.next().toLowerCase();
         while (answer.contains("y")) {
             System.out.print("Encrypt or decrypt? ");
             String direction = scanner.next().toLowerCase();

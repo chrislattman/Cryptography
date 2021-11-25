@@ -79,18 +79,16 @@ public class DSA {
         System.out.println("alpha = " + alpha.toString(16));
         
         /*
-         * a is a private parameter chosen randomly
+         * a is a private parameter chosen randomly.
          * 
-         * The range of a is [2, q - 1] and a is (by default) relatively prime
-         * to p.
+         * The range of a is [2, q - 1].
          * 
-         * If a is not in the acceptable range, a new value of a is chosen 
+         * If a is not in the acceptable range, a new value of a is chosen
          * until it falls in the valid range.
          */
         SecureRandom random = new SecureRandom();
         BigInteger a = new BigInteger(256, random);
-        while (a.compareTo(BigInteger.TWO) < 0 || 
-               a.compareTo(q.subtract(BigInteger.ONE)) > 0) {
+        if (a.compareTo(BigInteger.TWO) < 0 || a.compareTo(q) >= 0) {
             a = new BigInteger(256, random);
         }
         
@@ -134,9 +132,10 @@ public class DSA {
             BigInteger m = new BigInteger(1, mbytes);
             
             /*
-             * k is chosen randomly and is relatively prime to q
+             * k is a private parameter chosen randomly. 
              * 
-             * The range of k is [2, q - 1].
+             * The range of k is [1, q - 1]. By default, k is relatively prime
+             * to q.
              * 
              * If k is not in the acceptable range, a new value of k is chosen
              * until it falls in the valid range.
@@ -145,8 +144,7 @@ public class DSA {
              * signature. Otherwise DSA is susceptible to attack.
              */
             BigInteger k = new BigInteger(256, random);
-            while (k.compareTo(BigInteger.ONE) < 0 || 
-                   k.compareTo(q.subtract(BigInteger.ONE)) > 0) {
+            while (k.compareTo(BigInteger.ONE) < 0 || k.compareTo(q) >= 0) {
                 k = new BigInteger(256, random);
             }
             
