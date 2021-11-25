@@ -52,9 +52,8 @@ public class FFS {
      * Public: (n, values, x, b, y)
      * Private: (p, q, secrets, r)
      * 
-     * @param scanner
-     * @param k
-     * @return
+     * @param scanner standard input from the main function
+     * @param k the amount of secret numbers (and public values) to use
      */
     public static void ffs(Scanner scanner, int k) {
         /*
