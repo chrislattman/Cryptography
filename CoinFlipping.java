@@ -78,12 +78,12 @@ public class CoinFlipping {
         assert neg_guess2.modPow(BigInteger.TWO, n).equals(x);
         assert a.modPow(BigInteger.TWO, n).equals(x);
         assert a.negate().mod(n).modPow(BigInteger.TWO, n).equals(x);
-        System.out.println(guess1.mod(n));
-        System.out.println(neg_guess1.mod(n));
-        System.out.println(guess2.mod(n));
-        System.out.println(neg_guess2.mod(n));
-        System.out.println(a.mod(n));
-        System.out.println(a.negate().mod(n));
+        System.out.println(guess1.mod(n).toString(16));
+        System.out.println(neg_guess1.mod(n).toString(16));
+        System.out.println(guess2.mod(n).toString(16));
+        System.out.println(neg_guess2.mod(n).toString(16));
+        System.out.println(a.mod(n).toString(16));
+        System.out.println(a.negate().mod(n).toString(16));
         
         /*
          * The guesser chooses one of the pairs (guess1, -guess1) or
