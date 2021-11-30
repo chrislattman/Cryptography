@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class CoinFlipping {
 
     /**
-     * The remote coin-flipping protocol. Currently broken.
+     * The remote coin-flipping protocol. Currently broken for large integers.
      * 
      * Public: (n, x)
      * Private: (p, q, a)
@@ -44,9 +44,9 @@ public class CoinFlipping {
          * Assuming the verifier does not know the values of p or q chosen by
          * the guesser, the verifier must choose a such that gcd(a, n) = 1.
          * 
-         * n should be large enough such that gcd(a, n) != 1 is exceedingly
-         * rare. Otherwise, the verifier could efficiently factor n, defeating
-         * the protocol.
+         * n should be large enough such that finding an a where gcd(a, n) != 1
+         * is exceedingly rare. Otherwise, the verifier could efficiently
+         * factor n, defeating the protocol.
          */
         BigInteger a = new BigInteger(2048, random);
         while (a.compareTo(BigInteger.ONE) < 0 || a.compareTo(n) >= 1 ||
