@@ -1,2 +1,2 @@
 # Cryptography
-A suite of cryptographic primitives. They are entirely educational.
+A suite of cryptographic primitives and protocols. They are entirely educational.
