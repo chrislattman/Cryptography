@@ -38,8 +38,8 @@ public class RSASignature {
             System.out.println("3. RSA-SHA");
             System.out.print("Enter the number of the signature scheme you "
                 + "would like to use: ");
+            String schemeInput = scanner.next().replaceAll("[^0-9]", "");
             try {
-                String schemeInput = scanner.next().replaceAll("[^0-9]", "");
                 int scheme = Integer.parseInt(schemeInput);
                 if (scheme == 1) {
                     rsaSignatures(scanner, false, false);
@@ -217,7 +217,7 @@ public class RSASignature {
          * Existential forgeries are possible by choosing any y, computing
          * m = y^e (mod n), and publishing (m, y), which verifies. However,
          * m will probably look like random noise in this case, making
-         * existantial forgeries largely a non-issue.
+         * existential forgeries largely a non-issue.
          * 
          * In addition, for a signed message (m, y), any signature (z, y), 
          * where message z = m (mod n) would verify as well. However, the

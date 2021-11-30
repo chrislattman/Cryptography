@@ -86,7 +86,7 @@ public class ElGamal {
         while (answer.contains("y")) {
             System.out.print("Encrypt or decrypt? ");
             String direction = scanner.next().toLowerCase();
-            if (direction.equals("encrypt")) {
+            if (direction.equals("encrypt") || direction.equals("e")) {
                 /*
                  * The message m is obtained from standard input and is then
                  * encoded using the getBytes() String method (UTF-8).
@@ -130,7 +130,7 @@ public class ElGamal {
                 System.out.println("c1 = " + g.toString(16));
                 System.out.println("c2 = " + c2.toString(16));
             }
-            else if (direction.equals("decrypt")) {
+            else if (direction.equals("decrypt") || direction.equals("d")) {
                 System.out.println("Enter c1 and c2 (in hex):");
                 System.out.print("c1 = ");
                 String c1val = scanner.next();

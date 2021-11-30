@@ -88,8 +88,7 @@ public class SchnorrSignature {
          */
         SecureRandom random = new SecureRandom();
         BigInteger a = new BigInteger(256, random);
-        while (a.compareTo(BigInteger.TWO) < 0 || 
-               a.compareTo(q.subtract(BigInteger.ONE)) > 0) {
+        while (a.compareTo(BigInteger.TWO) < 0 || a.compareTo(q) >= 0) {
             a = new BigInteger(256, random);
         }
         

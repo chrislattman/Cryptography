@@ -87,7 +87,7 @@ public class RSA {
         while (answer.contains("y")) {
             System.out.print("Encrypt or decrypt? ");
             String direction = scanner.next().toLowerCase();
-            if (direction.equals("encrypt")) {
+            if (direction.equals("encrypt") || direction.equals("e")) {
                 System.out.print("Enter the plaintext: ");
                 scanner.nextLine();
                 String plaintext = scanner.nextLine();
@@ -103,7 +103,7 @@ public class RSA {
                 BigInteger gamma = theta.modPow(e, n);
                 System.out.println("Ciphertext: " + gamma.toString(16));
             }
-            else if (direction.equals("decrypt")) {
+            else if (direction.equals("decrypt") || direction.equals("d")) {
                 System.out.print("Enter the ciphertext (in hex): ");
                 scanner.nextLine();
                 String ciphertext = scanner.nextLine();
