@@ -1,6 +1,7 @@
 package crypto;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Scanner;
 
@@ -18,8 +19,9 @@ public class RSA {
      * Private: (p, q, d, phi(n))
      * 
      * @param args not used
+     * @throws NoSuchAlgorithmException non-issue
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
          * Allows the user to use their own primes instead of randomly
          * generated primes. (Sophie Germain prime, safe prime) pairs are used
@@ -42,15 +44,15 @@ public class RSA {
         }
         else {
             /*
-             * Two distinct 1024-bit probable primes are chosen. In the rare 
+             * Two distinct 2048-bit probable primes are chosen. In the rare 
              * case that p = q, a new prime q is chosen until they are no 
              * longer equal.
              */
-            SecureRandom random = new SecureRandom();
-            p = BigInteger.probablePrime(1024, random);
-            q = BigInteger.probablePrime(1024, random);
+            SecureRandom random = SecureRandom.getInstanceStrong();
+            p = BigInteger.probablePrime(2048, random);
+            q = BigInteger.probablePrime(2048, random);
             while (p.equals(q)) {
-                q = BigInteger.probablePrime(1024, random);
+                q = BigInteger.probablePrime(2048, random);
             }
         }
         

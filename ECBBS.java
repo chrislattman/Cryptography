@@ -1,24 +1,24 @@
 package crypto;
 
 import java.math.BigInteger;
-import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.Scanner;
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Elliptic Curve Integrated Encryption Scheme (ECIES) in pure Java.
+ * Elliptic Curve Blum-Blum-Shub (ECBBS) pseudorandom number generator in pure
+ * Java. This Java program is a modification of
+ * https://www.researchgate.net/publication/326276409
  * 
- * This implementation of ECIES uses secp256r1, and the public parameters
+ * Credit goes to authors C. Omorog, B. Gerardo, and R. Medina for inspiring
+ * this algorithm.
+ * 
+ * This implementation of ECBBS uses secp256r1, and the public parameters
  * below were taken from https://www.secg.org/SEC2-Ver-1.0.pdf
  * 
  * @author Chris Lattman
  */
-public class ECIES {
+public class ECBBS {
     /*
      * The secp256r1 'a' coefficient.
      */
@@ -54,172 +54,105 @@ public class ECIES {
      */
     private static final String order = "FFFFFFFF00000000FFFFFFFFFFFFFFFF"
         + "BCE6FAADA7179E84F3B9CAC2FC632551";
-
+    
     /**
-     * The Elliptic Curve Integrated Encryption Scheme (ECIES).
-     * 
-     * The curve used is secp256r1 using base point g = (x, y)
-     *                  
-     * y^2 = x^3 + ax + b (mod p)
-     *         
-     * Public:  (p, curve (a, b), g = (x, y), n, qa, qb)
-     * Private: (da, db, s)
+     * The Elliptic Curve Blum-Blum-Shub (ECBBS) pseudorandom number generator.
      * 
      * @param args not used
-     * @throws Exception a whole host of exceptions can be thrown, although
-     *                   they are all non-issues in this implementation
+     * @throws NoSuchAlgorithmException non-issue
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
-         * Alice and Bob publicly agree to use the curve (a, b) with prime p
-         * and base point (x, y) with order n.
+         * Curve parameters for ECBBS
          */
         BigInteger a = new BigInteger(acoef, 16);
         BigInteger b = new BigInteger(bcoef, 16);
-        BigInteger p = new BigInteger(prime, 16);
+        BigInteger p_curve = new BigInteger(prime, 16);
         BigInteger x = new BigInteger(xcoord, 16);
         BigInteger y = new BigInteger(ycoord, 16);
         BigInteger n = new BigInteger(order, 16);
-        System.out.println("Public parameters for secp256r1");
-        System.out.println("curve: y^2 = x^3 + ax + b (mod p), where:");
-        System.out.println("a = " + a.toString(16));
-        System.out.println("b = " + b.toString(16));
-        System.out.println("p = " + p.toString(16));
-        System.out.println("with base point g = (x, y), where:");
-        System.out.println("x = " + x.toString(16));
-        System.out.println("y = " + y.toString(16));
-        System.out.println("and g has order " + n.toString(16));
         
         /*
-         * In this example, Alice sends a message to Bob, who set up this
-         * instance of ECIES.
+         * Generate a random d used to calculate random point a_i.
          * 
-         * Alice generates da randomly and Bob generates db randomly. These
-         * are both private.
+         * The range of d is [1, n - 1] (n is 256 bits long)
          * 
-         * The range of da and db is [1, n - 1] (n is 256 bits long)
-         * 
-         * If da or db are not in the acceptable range, new values of da and
-         * db are chosen until they fall in the valid range.
+         * If d is not in the acceptable range, a new value of d is chosen
+         * until it falls in the valid range.
          */
         SecureRandom random = SecureRandom.getInstanceStrong();
-        BigInteger da = new BigInteger(n.bitLength(), random);
-        BigInteger db = new BigInteger(n.bitLength(), random);
-        while (da.compareTo(BigInteger.ONE) < 0 || da.compareTo(n) >= 0 ||
-               db.compareTo(BigInteger.ONE) < 0 || db.compareTo(n) >= 0) {
-            da = new BigInteger(n.bitLength(), random);
-            db = new BigInteger(n.bitLength(), random);
+        BigInteger d = new BigInteger(n.bitLength(), random);
+        while (d.compareTo(BigInteger.ONE) < 0 || d.compareTo(n) >= 0) {
+            d = new BigInteger(n.bitLength(), random);
         }
         
         /*
-         * Alice's and Bob's public keys qa and qb, respectively, are
-         * generated using the Montgomery ladder with base point g and their 
-         * private parameters. Their public parameters are both points on the
-         * elliptic curve.
+         * The random point a_i is generated using the Montgomery ladder.
          */
         BigInteger[] g = {x, y};
-        BigInteger[] qa = montgomeryLadder(g, da, a, b, p);
-        BigInteger[] qb = montgomeryLadder(g, db, a, b, p);
-        System.out.println("qa = (" + qa[0].toString(16) + ", " + 
-            qa[1].toString(16) + ")");
-        System.out.println("qb = (" + qb[0].toString(16) + ", " + 
-            qb[1].toString(16) + ")");
+        BigInteger[] a_i = montgomeryLadder(g, d, a, b, p_curve);
         
         /*
-         * Alice computes shared secret point da * qb = da * db * g. Bob can 
-         * also compute this shared secret by computing db * qa = db * da * g.
-         */
-        BigInteger[] secret = montgomeryLadder(qb, da, a, b, p);
-        
-        /*
-         * hash is an instance of SHA-512, the cryptographic hash function 
-         * used by ECIES
+         * Since floor(log_2(n)) is equal to the bit length of n minus 1, the
+         * code uses the bit length function instead.
          * 
-         * hmac is an instance of HMAC_SHA-256, the MAC function used to
-         * verify data integrity
-         */
-        MessageDigest hash = MessageDigest.getInstance("SHA-512");
-        Mac hmac = Mac.getInstance("HmacSHA256");
-        
-        /*
-         * Alice computes the secret keys for AES and HMAC by hashing the 
-         * shared secret = db * da * g. Bob can do the same, since he knows 
-         * the shared secret as well.
+         * The range of n_i is [2, floor(log_2(n)) - 1]
          * 
-         * The shared secret is hashed by concatenating the coordinates of
-         * the secret key. The output represents two keys since the leftmost 
-         * 256 bits are the encryption key and the rightmost 256 bits are 
-         * the HMAC key.
+         * If n_i is not in the acceptable range, a new value of n_i is chosen
+         * until it falls in the valid range.
          */
-        BigInteger concat = secret[0].shiftLeft(secret[1].bitLength());
-        concat = concat.or(secret[1]);
-        byte[] kbytes = hash.digest(concat.toByteArray());
-        byte[] enckeybytes = new byte[32];
-        byte[] mackeybytes = new byte[32];
-        for (int i = 0; i < 32; i++) {
-            enckeybytes[i] = kbytes[i];
+        int p_bbs_int = n.bitLength() - 2;
+        String p_bbs_str = String.valueOf(p_bbs_int);
+        BigInteger p_bbs = new BigInteger(p_bbs_str);
+        BigInteger n_i = new BigInteger(p_bbs.bitLength(), random);
+        while (n_i.compareTo(BigInteger.TWO) < 0 || n_i.compareTo(p_bbs) >= 0) {
+            n_i = new BigInteger(p_bbs.bitLength(), random);
         }
-        for (int j = 0; j < 32; j++) {
-            mackeybytes[j] = kbytes[j + 32];
-        }
-        SecretKeySpec enck = new SecretKeySpec(enckeybytes, "AES");
-        SecretKeySpec mack = new SecretKeySpec(mackeybytes, "HmacSHA256");
         
         /*
-         * This is the message to be sent from Alice to Bob.
+         * Ask user how many random bits are desired.
          */
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter the message for Alice to encrypt: ");
-        String message = scanner.nextLine();
+        int bits = 0;
+        while (true) {
+            try {
+                System.out.print("Enter how many random bits ");
+                System.out.print("you would like (enter q to quit): ");
+                String bitsString = scanner.next();
+                if (bitsString.contains("q")) {
+                    break;
+                }
+                bitsString = bitsString.replaceAll("[^0-9]", "");
+                bits = Integer.parseInt(bitsString);
+                break;
+            }
+            catch (Exception e) {
+                System.out.println("Invalid input.");
+            }
+        }
         scanner.close();
         
         /*
-         * cipher is an instance of 256-bit AES with CBC mode and PKCS5 
-         * padding, the block cipher used by IES
+         * The modified ECBBS algorithm. Instead of using rational numbers,
+         * it takes the XOR of the last two bits in each curve point generated.
          * 
-         * It is initialized to encrypt data using the secret key k and an
-         * initialization vector iv of {0} for AES's CBC mode.
+         * The output bit is if the XOR is true (equal to 1).
          */
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        byte[] iv = new byte[16];
-        IvParameterSpec ivspec = new IvParameterSpec(iv);
-        cipher.init(Cipher.ENCRYPT_MODE, enck, ivspec);
+        BigInteger r = BigInteger.ZERO;
+        for (int i = 0; i < bits; i++) {
+            a_i = montgomeryLadder(a_i, n_i, a, b, p_curve);
+            boolean xor = a_i[0].testBit(0) ^ a_i[1].testBit(0);
+            if (xor) {
+                r = r.setBit(i);
+            }
+            n_i = n_i.modPow(BigInteger.TWO, p_bbs);
+        }
         
-        /*
-         * HMAC is initialized with the mac key
-         */
-        hmac.init(mack);
-        
-        /*
-         * The message is encrypted with AES, and the ciphertext is hashed
-         * using HMAC.
-         * 
-         * The Base64 class is used due to padding.
-         */
-        byte[] ciphertextbytes = cipher.doFinal(message.getBytes());
-        byte[] tagbytes = hmac.doFinal(ciphertextbytes);
-        String ciphertext = Base64.getEncoder().encodeToString(
-            ciphertextbytes);
-        String tag = Base64.getEncoder().encodeToString(tagbytes);
-        String output = qa[0].toString(16) + qa[1].toString(16) + ciphertext 
-            + tag;
-        System.out.println("qa||ciphertext||tag: " + output);
-        
-        /*
-         * Bob then decrypts the message using the secret keys and the 
-         * initialization vector iv (which were generated earlier). Bob can
-         * generate the secret keys because he knows the shared secret point.
-         * (This calculation was done above earlier.)
-         * 
-         * Here, the same block cipher is reused for decryption.
-         */
-        cipher.init(Cipher.DECRYPT_MODE, enck, ivspec);
-        byte[] cipherbytes = Base64.getDecoder().decode(ciphertext);
-        byte[] plaintextbytes = cipher.doFinal(cipherbytes);
-        String plaintext = new String(plaintextbytes);
-        System.out.println("Plaintext: " + plaintext);
+        if (bits > 0) {
+            System.out.println("Random number (in hex): " + r.toString(16));
+        }
     }
-
+    
     /**
      * The Montgomery ladder implementation. It takes no extra
      * computational time, and provides security against side-channel

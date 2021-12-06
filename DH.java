@@ -1,6 +1,7 @@
 package crypto;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
@@ -24,15 +25,15 @@ public class DH {
      * 2048-bit prime obtained from https://www.ietf.org/rfc/rfc3526.txt
      * A generator of the prime is 2.
      */
-    public static String prime = "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628"
-        + "B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF951"
-        + "9B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44"
-        + "C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE64"
-        + "9286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5"
-        + "F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9"
-        + "804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC0"
-        + "7A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D226189"
-        + "8FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF";
+    private static final String prime = "FFFFFFFFFFFFFFFFC90FDAA22168C234"
+        + "C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404"
+        + "DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E"
+        + "7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C"
+        + "4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8"
+        + "FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C35"
+        + "4E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B27"
+        + "83A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515"
+        + "D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF";
 
     /**
      * The Diffie-Hellman key exchange (DH).
@@ -44,8 +45,9 @@ public class DH {
      * Private: (a, b, s)
      * 
      * @param args not used
+     * @throws NoSuchAlgorithmException non-issue
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
          * Alice and Bob publicly agree to use prime p and generator alpha.
          */
@@ -64,7 +66,7 @@ public class DH {
          * If a or b are not in the acceptable range, new values of a and b
          * are chosen until they fall in the valid range.
          */
-        SecureRandom random = new SecureRandom();
+        SecureRandom random = SecureRandom.getInstanceStrong();
         BigInteger a = new BigInteger(2048, random);
         BigInteger b = new BigInteger(2048, random);
         while (a.compareTo(BigInteger.TWO) < 0 || 
@@ -101,7 +103,7 @@ public class DH {
          * hence Alice and Bob have the same secret key.
          */
         if (secretA.equals(secretB)) {
-            System.out.println("g^b (mod p) = h^a (mod p)");
+            System.out.println("g^b (mod p) == h^a (mod p)");
         }
         else {
             // the following line should never be called

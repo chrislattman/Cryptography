@@ -1,6 +1,7 @@
 package crypto;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
@@ -15,38 +16,38 @@ public class ECDH {
     /*
      * The secp256r1 'a' coefficient.
      */
-    public static String acoef = "FFFFFFFF00000001000000000000000000000000"
-        + "FFFFFFFFFFFFFFFFFFFFFFFC";
+    private static final String acoef = "FFFFFFFF000000010000000000000000"
+        + "00000000FFFFFFFFFFFFFFFFFFFFFFFC";
     
     /*
      * The secp256r1 'b' coefficient.
      */
-    public static String bcoef = "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0"
-        + "CC53B0F63BCE3C3E27D2604B";
+    private static final String bcoef = "5AC635D8AA3A93E7B3EBBD55769886BC"
+        + "651D06B0CC53B0F63BCE3C3E27D2604B";
     
     /*
      * The secp256r1 prime = 2^224 * (2^32 - 1) + 2^192 + 2^96 - 1
      */
-    public static String prime = "FFFFFFFF00000001000000000000000000000000"
-        + "FFFFFFFFFFFFFFFFFFFFFFFF";
+    private static final String prime = "FFFFFFFF000000010000000000000000"
+        + "00000000FFFFFFFFFFFFFFFFFFFFFFFF";
     
     /*
      * The secp256r1 base point (generator point) x-coordinate.
      */
-    public static String xcoord = "6B17D1F2E12C4247F8BCE6E563A440F277037D8"
-        + "12DEB33A0F4A13945D898C296";
+    private static final String xcoord = "6B17D1F2E12C4247F8BCE6E563A440F"
+        + "277037D812DEB33A0F4A13945D898C296";
     
     /*
      * The secp256r1 base point (generator point) y-coordinate.
      */
-    public static String ycoord = "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE335"
-        + "76B315ECECBB6406837BF51F5";
+    private static final String ycoord = "4FE342E2FE1A7F9B8EE7EB4A7C0F9E1"
+        + "62BCE33576B315ECECBB6406837BF51F5";
     
     /*
      * The order of the secp256r1 generator point (cofactor is 1).
      */
-    public static String order = "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAAD"
-        + "A7179E84F3B9CAC2FC632551";
+    private static final String order = "FFFFFFFF00000000FFFFFFFFFFFFFFFF"
+        + "BCE6FAADA7179E84F3B9CAC2FC632551";
 
     /**
      * The Elliptic Curve Diffie-Hellman (ECDH) key exchange.
@@ -59,8 +60,9 @@ public class ECDH {
      * Private: (da, db, s)
      * 
      * @param args not used
+     * @throws NoSuchAlgorithmException non-issue
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
          * Alice and Bob publicly agree to use the curve (a, b) with prime p
          * and base point (x, y) with order n.
@@ -90,13 +92,11 @@ public class ECDH {
          * If da or db are not in the acceptable range, new values of da and
          * db are chosen until they fall in the valid range.
          */
-        SecureRandom random = new SecureRandom();
+        SecureRandom random = SecureRandom.getInstanceStrong();
         BigInteger da = new BigInteger(n.bitLength(), random);
         BigInteger db = new BigInteger(n.bitLength(), random);
-        while (da.compareTo(BigInteger.ONE) < 0 || 
-               da.compareTo(n.subtract(BigInteger.ONE)) > 0 ||
-               db.compareTo(BigInteger.ONE) < 0 ||
-               db.compareTo(n.subtract(BigInteger.ONE)) > 0) {
+        while (da.compareTo(BigInteger.ONE) < 0 || da.compareTo(n) >= 0 ||
+               db.compareTo(BigInteger.ONE) < 0 || db.compareTo(n) >= 0) {
             da = new BigInteger(n.bitLength(), random);
             db = new BigInteger(n.bitLength(), random);
         }
@@ -128,7 +128,7 @@ public class ECDH {
          * Alice and Bob have the same secret key.
          */
         if (secretA[0].equals(secretB[0]) && secretA[1].equals(secretB[1])) {
-            System.out.println("da * qb = db * qa");
+            System.out.println("da * qb == db * qa");
         }
         else {
             // the following line should never be called

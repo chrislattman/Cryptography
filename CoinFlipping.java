@@ -1,6 +1,7 @@
 package crypto;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Scanner;
 
@@ -13,21 +14,22 @@ public class CoinFlipping {
      * Private: (p, q, a)
      * 
      * @param args not used
+     * @throws NoSuchAlgorithmException non-issue
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
-         * Primes p and q are chosen such that they are of the form 4k + 3,
-         * which means that the two rightmost (lowest-order) bits should be 
-         * set to 1.
+         * 2048-bit primes p and q are chosen such that they are of the form
+         * 4k + 3, which means that the two rightmost (lowest-order) bits
+         * should be set to 1.
          */
-        SecureRandom random = new SecureRandom();
-        BigInteger p = BigInteger.probablePrime(1024, random);
-        BigInteger q = BigInteger.probablePrime(1024, random);
+        SecureRandom random = SecureRandom.getInstanceStrong();
+        BigInteger p = BigInteger.probablePrime(2048, random);
+        BigInteger q = BigInteger.probablePrime(2048, random);
         while (!p.testBit(0) || !p.testBit(1)) {
-            p = BigInteger.probablePrime(1024, random);
+            p = BigInteger.probablePrime(2048, random);
         }
         while (p.equals(q) || !q.testBit(0) || !q.testBit(1)) {
-            q = BigInteger.probablePrime(1024, random);
+            q = BigInteger.probablePrime(2048, random);
         }
         
         /*
@@ -48,13 +50,11 @@ public class CoinFlipping {
          * is exceedingly rare. Otherwise, the verifier could efficiently
          * factor n, defeating the protocol.
          */
-        BigInteger a = new BigInteger(2048, random);
+        BigInteger a = new BigInteger(4096, random);
         while (a.compareTo(BigInteger.ONE) < 0 || a.compareTo(n) >= 1 ||
                !gcd(a, n).equals(BigInteger.ONE)) {
-            a = new BigInteger(2048, random);
+            a = new BigInteger(4096, random);
         }
-        System.out.println("a = " + a.toString(16));
-        System.out.println("-a = " + a.negate().mod(n).toString(16));
         
         /*
          * The verifier sends x = a^2 (mod n) back to the guesser.
@@ -134,7 +134,7 @@ public class CoinFlipping {
      * @param b second integer 
      * @return the GCD of a and b
      */
-    public static BigInteger gcd(BigInteger a, BigInteger b) {
+    private static BigInteger gcd(BigInteger a, BigInteger b) {
         if (b.equals(BigInteger.ZERO)) {
             return a;
         }
@@ -150,7 +150,7 @@ public class CoinFlipping {
      * @param x the square of the verifier's choice of a (mod n)
      * @return the square roots of x (mod n)
      */
-    public static BigInteger[] crt(BigInteger p, BigInteger q, BigInteger x) {
+    private static BigInteger[] crt(BigInteger p, BigInteger q, BigInteger x) {
         BigInteger n = p.multiply(q);
         BigInteger first = x.mod(p).sqrt();
         BigInteger second = x.mod(q).sqrt();

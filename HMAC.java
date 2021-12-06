@@ -14,15 +14,15 @@ public class HMAC {
      * These are the cryptographic hash functions supported by the
      * MessageDigest class.
      */
-    public static String[] hashes = {"MD2", "MD5", "SHA-1", "SHA-224", 
+    private static final String[] hashes = {"MD2", "MD5", "SHA-1", "SHA-224", 
         "SHA-256", "SHA-384", "SHA-512/224", "SHA-512/256", "SHA3-224", 
         "SHA3-256", "SHA3-384", "SHA3-512"};
     
     /*
      * The block sizes for the above hash functions, ordered and in bits.
      */
-    public static int[] blockSizes = {128, 512, 512, 512, 512, 1024, 1024, 
-        1024, 1152, 1088, 832, 576};
+    private static final int[] blockSizes = {128, 512, 512, 512, 512, 1024,
+        1024, 1024, 1152, 1088, 832, 576};
 
     /**
      * The HMAC message authentication code generator. It takes in a hash

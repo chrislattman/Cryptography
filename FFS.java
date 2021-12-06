@@ -1,6 +1,7 @@
 package crypto;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -54,18 +55,20 @@ public class FFS {
      * 
      * @param scanner standard input from the main function
      * @param k the amount of secret numbers (and public values) to use
+     * @throws NoSuchAlgorithmException non-issue
      */
-    public static void ffs(Scanner scanner, int k) {
+    private static void ffs(Scanner scanner, int k) throws 
+        NoSuchAlgorithmException {
         /*
-         * Two distinct 1024-bit probable primes are chosen. In the rare 
+         * Two distinct 2048-bit probable primes are chosen. In the rare 
          * case that p = q, a new prime q is chosen until they are no 
          * longer equal.
          */
-        SecureRandom random = new SecureRandom();
-        BigInteger p = BigInteger.probablePrime(1024, random);
-        BigInteger q = BigInteger.probablePrime(1024, random);
+        SecureRandom random = SecureRandom.getInstanceStrong();
+        BigInteger p = BigInteger.probablePrime(2048, random);
+        BigInteger q = BigInteger.probablePrime(2048, random);
         while (p.equals(q)) {
-            q = BigInteger.probablePrime(1024, random);
+            q = BigInteger.probablePrime(2048, random);
         }
         
         /*

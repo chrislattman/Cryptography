@@ -1,6 +1,7 @@
 package crypto;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Scanner;
 
@@ -19,15 +20,15 @@ public class ElGamalSignature {
      * 2048-bit prime obtained from https://www.ietf.org/rfc/rfc3526.txt
      * A generator of the prime is 2.
      */
-    public static String prime = "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628"
-        + "B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF951"
-        + "9B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44"
-        + "C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE64"
-        + "9286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5"
-        + "F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9"
-        + "804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC0"
-        + "7A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D226189"
-        + "8FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF";
+    private static final String prime = "FFFFFFFFFFFFFFFFC90FDAA22168C234"
+        + "C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404"
+        + "DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E"
+        + "7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C"
+        + "4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8"
+        + "FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C35"
+        + "4E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B27"
+        + "83A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515"
+        + "D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF";
     
     /**
      * The ElGamal Signature Scheme.
@@ -39,8 +40,9 @@ public class ElGamalSignature {
      * Private: (a, k)
      * 
      * @param args not used
+     * @throws NoSuchAlgorithmException non-issue
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         /*
          * Prime p and generator alpha are described above. They are public.
          */
@@ -58,8 +60,11 @@ public class ElGamalSignature {
          * Since a must be invertible under multiplication mod p - 1, it
          * suffices to choose k to be a probable prime less than p - 1.
          */
-        SecureRandom random = new SecureRandom();
-        BigInteger a = BigInteger.probablePrime(1024, random);
+        SecureRandom random = SecureRandom.getInstanceStrong();
+        BigInteger a = BigInteger.probablePrime(2048, random);
+        while (a.compareTo(p.subtract(BigInteger.ONE)) >= 0) {
+            a = BigInteger.probablePrime(2048, random);
+        }
         
         /*
          * Compute beta = alpha^a (mod p). This is a public parameter.
@@ -102,7 +107,10 @@ public class ElGamalSignature {
              * forgeries by revealing a, the private parameter. This allows an
              * attacker to compute s for any message with random k.
              */
-            BigInteger k = BigInteger.probablePrime(1024, random);
+            BigInteger k = BigInteger.probablePrime(2048, random);
+            while (k.compareTo(p.subtract(BigInteger.ONE)) >= 0) {
+                k = BigInteger.probablePrime(2048, random);
+            }
             
             /*
              * r, the first signature value, is computed as 

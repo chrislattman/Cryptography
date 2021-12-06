@@ -45,7 +45,7 @@ public class TLS {
          */
         ECGenParameterSpec ecGen = new ECGenParameterSpec("secp256r1");
         KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance("EC");
-        SecureRandom random = new SecureRandom();
+        SecureRandom random = SecureRandom.getInstanceStrong();
         keyPairGen.initialize(ecGen, random);
         KeyPair keyPair = keyPairGen.generateKeyPair();
         

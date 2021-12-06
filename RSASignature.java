@@ -82,12 +82,12 @@ public class RSASignature {
      * @param blind if true, blind signatures are used
      * @throws NoSuchAlgorithmException non-issue (SHA-256 is defined)
      */
-    public static void rsaSignatures(Scanner scanner, boolean hash, 
+    private static void rsaSignatures(Scanner scanner, boolean hash, 
         boolean blind) throws NoSuchAlgorithmException {
         System.out.print("Would like you use custom primes, i.e. "
             + "Sophie Germain/safe primes? y/n: ");
         String answer = scanner.next().toLowerCase();
-        SecureRandom random = new SecureRandom();
+        SecureRandom random = SecureRandom.getInstanceStrong();
         BigInteger p, q;
         
         if (answer.contains("y")) {
@@ -101,14 +101,14 @@ public class RSASignature {
         }
         else {
             /*
-             * Two distinct 1024-bit probable primes are chosen. In the rare
+             * Two distinct 2048-bit probable primes are chosen. In the rare
              * case that p = q, a new prime q is chosen until they are no 
              * longer equal.
              */
-            p = BigInteger.probablePrime(1024, random);
-            q = BigInteger.probablePrime(1024, random);
+            p = BigInteger.probablePrime(2048, random);
+            q = BigInteger.probablePrime(2048, random);
             while (p.equals(q)) {
-                q = BigInteger.probablePrime(1024, random);
+                q = BigInteger.probablePrime(2048, random);
             }
         }
         
@@ -163,11 +163,14 @@ public class RSASignature {
              * 
              * Since k must be invertible under multiplication mod n, it
              * suffices to choose k to be a random number less than n not
-             * equal to p or q.
+             * equal to p or q. However, Bob does not know the values of p or
+             * q, since Alice chose them privately. Therefore, it suffices to
+             * check that gcd(k, n) = 1. The chance of gcd(k, n) != 1 is
+             * 1 in 2^(2048).
              */
-            BigInteger k = new BigInteger(2048, random);
-            while (k.compareTo(n) >= 0 || k.equals(p) || k.equals(q)) {
-                k = new BigInteger(2048, random);
+            BigInteger k = new BigInteger(4096, random);
+            while (k.compareTo(n) >= 0 || !gcd(k, n).equals(BigInteger.ONE)) {
+                k = new BigInteger(4096, random);
             }
             
             /*
@@ -231,5 +234,20 @@ public class RSASignature {
             // the following line should never be called
             System.out.println("Signature is not verified.");
         }
+    }
+    
+    /**
+     * Greatest Common Denominator (GCD) function.
+     * 
+     * @param a first integer
+     * @param b second integer 
+     * @return the GCD of a and b
+     */
+    private static BigInteger gcd(BigInteger a, BigInteger b) {
+        if (b.equals(BigInteger.ZERO)) {
+            return a;
+        }
+        
+        return gcd(b, a.mod(b));
     }
 }
