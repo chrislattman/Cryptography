@@ -67,7 +67,7 @@ public class ECBBS {
          */
         BigInteger a = new BigInteger(acoef, 16);
         BigInteger b = new BigInteger(bcoef, 16);
-        BigInteger p_curve = new BigInteger(prime, 16);
+        BigInteger p = new BigInteger(prime, 16);
         BigInteger x = new BigInteger(xcoord, 16);
         BigInteger y = new BigInteger(ycoord, 16);
         BigInteger n = new BigInteger(order, 16);
@@ -90,7 +90,7 @@ public class ECBBS {
          * The random point a_i is generated using the Montgomery ladder.
          */
         BigInteger[] g = {x, y};
-        BigInteger[] a_i = montgomeryLadder(g, d, a, b, p_curve);
+        BigInteger[] a_i = montgomeryLadder(g, d, a, b, p);
         
         /*
          * Since floor(log_2(n)) is equal to the bit length of n minus 1, the
@@ -101,11 +101,11 @@ public class ECBBS {
          * If n_i is not in the acceptable range, a new value of n_i is chosen
          * until it falls in the valid range.
          */
-        BigInteger p_bbs = BigInteger.valueOf((long) n.bitLength() - 2);
-        BigInteger n_i = new BigInteger(p_bbs.bitLength(), random);
+        BigInteger n_i_max = BigInteger.valueOf((long) n.bitLength() - 2);
+        BigInteger n_i = new BigInteger(n_i_max.bitLength(), random);
         while (n_i.compareTo(BigInteger.TWO) < 0 || 
-               n_i.compareTo(p_bbs) >= 0) {
-            n_i = new BigInteger(p_bbs.bitLength(), random);
+               n_i.compareTo(n_i_max) >= 0) {
+            n_i = new BigInteger(n_i_max.bitLength(), random);
         }
         
         /*
@@ -139,12 +139,12 @@ public class ECBBS {
          */
         BigInteger r = BigInteger.ZERO;
         for (int i = 0; i < bits; i++) {
-            a_i = montgomeryLadder(a_i, n_i, a, b, p_curve);
+            a_i = montgomeryLadder(a_i, n_i, a, b, p);
             boolean xor = a_i[0].testBit(0) ^ a_i[1].testBit(0);
             if (xor) {
                 r = r.setBit(i);
             }
-            n_i = n_i.modPow(BigInteger.TWO, p_bbs);
+            n_i = n_i.modPow(BigInteger.TWO, n_i_max);
         }
         
         if (bits > 0) {
