@@ -94,7 +94,7 @@ public class ECBBS {
         
         /*
          * Since floor(log_2(n)) is equal to the bit length of n minus 1, the
-         * code uses the bit length function instead.
+         * following code uses the bitLength() function instead.
          * 
          * The range of n_i is [2, floor(log_2(n)) - 1]
          * 
