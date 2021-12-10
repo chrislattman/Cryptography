@@ -101,11 +101,10 @@ public class ECBBS {
          * If n_i is not in the acceptable range, a new value of n_i is chosen
          * until it falls in the valid range.
          */
-        int p_bbs_int = n.bitLength() - 2;
-        String p_bbs_str = String.valueOf(p_bbs_int);
-        BigInteger p_bbs = new BigInteger(p_bbs_str);
+        BigInteger p_bbs = BigInteger.valueOf((long) n.bitLength() - 2);
         BigInteger n_i = new BigInteger(p_bbs.bitLength(), random);
-        while (n_i.compareTo(BigInteger.TWO) < 0 || n_i.compareTo(p_bbs) >= 0) {
+        while (n_i.compareTo(BigInteger.TWO) < 0 || 
+               n_i.compareTo(p_bbs) >= 0) {
             n_i = new BigInteger(p_bbs.bitLength(), random);
         }
         
