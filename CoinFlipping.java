@@ -52,7 +52,7 @@ public class CoinFlipping {
          */
         BigInteger a = new BigInteger(4096, random);
         while (a.compareTo(BigInteger.ONE) < 0 || a.compareTo(n) >= 1 ||
-               !gcd(a, n).equals(BigInteger.ONE)) {
+               !a.gcd(n).equals(BigInteger.ONE)) {
             a = new BigInteger(4096, random);
         }
         
@@ -125,21 +125,6 @@ public class CoinFlipping {
             System.out.println("(" + a.toString(16) + ", " + 
                     a.negate().mod(n).toString(16) + ")");
         }
-    }
-    
-    /**
-     * Greatest Common Denominator (GCD) function.
-     * 
-     * @param a first integer
-     * @param b second integer 
-     * @return the GCD of a and b
-     */
-    private static BigInteger gcd(BigInteger a, BigInteger b) {
-        if (b.equals(BigInteger.ZERO)) {
-            return a;
-        }
-        
-        return gcd(b, a.mod(b));
     }
     
     /**

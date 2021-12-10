@@ -169,7 +169,7 @@ public class RSASignature {
              * 1 in 2^(2048).
              */
             BigInteger k = new BigInteger(4096, random);
-            while (k.compareTo(n) >= 0 || !gcd(k, n).equals(BigInteger.ONE)) {
+            while (k.compareTo(n) >= 0 || !k.gcd(n).equals(BigInteger.ONE)) {
                 k = new BigInteger(4096, random);
             }
             
@@ -234,20 +234,5 @@ public class RSASignature {
             // the following line should never be called
             System.out.println("Signature is not verified.");
         }
-    }
-    
-    /**
-     * Greatest Common Denominator (GCD) function.
-     * 
-     * @param a first integer
-     * @param b second integer 
-     * @return the GCD of a and b
-     */
-    private static BigInteger gcd(BigInteger a, BigInteger b) {
-        if (b.equals(BigInteger.ZERO)) {
-            return a;
-        }
-        
-        return gcd(b, a.mod(b));
     }
 }
