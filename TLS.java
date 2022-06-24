@@ -134,7 +134,6 @@ public class TLS {
              * The client can also generate these keys since they generated 
              * the master secret in the first place.
              */
-            cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             byte[] cipherTextBytes = Base64.getDecoder().decode(ciphertext);
             byte[] masterSecretBytes = cipher.doFinal(cipherTextBytes);
