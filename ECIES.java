@@ -13,52 +13,54 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Elliptic Curve Integrated Encryption Scheme (ECIES) in pure Java.
  * 
- * This implementation of ECIES uses secp256r1, and the public parameters
- * below were taken from https://www.secg.org/SEC2-Ver-1.0.pdf
+ * This implementation of ECIES uses the secp256k1 Koblitz curve, and the
+ * public parameters below were taken from
+ * https://www.secg.org/SEC2-Ver-1.0.pdf
  * 
  * @author Chris Lattman
  */
 public class ECIES {
     /*
-     * The secp256r1 'a' coefficient.
+     * The secp256k1 'a' coefficient.
      */
-    private static final String acoef = "FFFFFFFF000000010000000000000000"
-        + "00000000FFFFFFFFFFFFFFFFFFFFFFFC";
+    private static final String acoef = "0";
     
     /*
-     * The secp256r1 'b' coefficient.
+     * The secp256k1 'b' coefficient.
      */
-    private static final String bcoef = "5AC635D8AA3A93E7B3EBBD55769886BC"
-        + "651D06B0CC53B0F63BCE3C3E27D2604B";
+    private static final String bcoef = "7";
     
     /*
-     * The secp256r1 prime = 2^224 * (2^32 - 1) + 2^192 + 2^96 - 1
+     * The secp256k1 prime = 2^256 - 2^32 - 2^9 - 2^8 - 2^7 - 2^6 - 2^4 - 1
      */
-    private static final String prime = "FFFFFFFF000000010000000000000000"
-        + "00000000FFFFFFFFFFFFFFFFFFFFFFFF";
+    private static final String prime = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+            + "FFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F";
     
     /*
-     * The secp256r1 base point (generator point) x-coordinate.
+     * The secp256k1 base point (generator point) x-coordinate. It is the first
+     * 32 bytes of the uncompressed form of G, excluding the first byte (used
+     * to identify uncompressed points).
      */
-    private static final String xcoord = "6B17D1F2E12C4247F8BCE6E563A440F"
-        + "277037D812DEB33A0F4A13945D898C296";
+    private static final String xcoord = "79BE667EF9DCBBAC55A06295CE870B0"
+        + "7029BFCDB2DCE28D959F2815B16F81798";
     
     /*
-     * The secp256r1 base point (generator point) y-coordinate.
+     * The secp256k1 base point (generator point) y-coordinate. It is the last
+     * 32 bytes of the uncompressed form of G.
      */
-    private static final String ycoord = "4FE342E2FE1A7F9B8EE7EB4A7C0F9E1"
-        + "62BCE33576B315ECECBB6406837BF51F5";
+    private static final String ycoord = "483ADA7726A3C4655DA4FBFC0E1108A"
+        + "8FD17B448A68554199C47D08FFB10D4B8";
     
     /*
-     * The order of the secp256r1 generator point (cofactor is 1).
+     * The order of the secp256k1 generator point (cofactor is 1).
      */
-    private static final String order = "FFFFFFFF00000000FFFFFFFFFFFFFFFF"
-        + "BCE6FAADA7179E84F3B9CAC2FC632551";
+    private static final String order = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE"
+        + "BAAEDCE6AF48A03BBFD25E8CD0364141";
 
     /**
      * The Elliptic Curve Integrated Encryption Scheme (ECIES).
      * 
-     * The curve used is secp256r1 using base point g = (x, y)
+     * The curve used is secp256k1 using base point g = (x, y)
      *                  
      * y^2 = x^3 + ax + b (mod p)
      *         
@@ -80,7 +82,7 @@ public class ECIES {
         BigInteger x = new BigInteger(xcoord, 16);
         BigInteger y = new BigInteger(ycoord, 16);
         BigInteger n = new BigInteger(order, 16);
-        System.out.println("Public parameters for secp256r1");
+        System.out.println("Public parameters for secp256k1");
         System.out.println("curve: y^2 = x^3 + ax + b (mod p), where:");
         System.out.println("a = " + a.toString(16));
         System.out.println("b = " + b.toString(16));

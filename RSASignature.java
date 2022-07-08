@@ -58,7 +58,7 @@ public class RSASignature {
                 System.out.println("Invalid input.");
             }
             System.out.println();
-            System.out.print("Would you like to sign a message? y/n: ");
+            System.out.print("Would you like to sign another message? y/n: ");
             answer = scanner.next();
         }
         scanner.close();

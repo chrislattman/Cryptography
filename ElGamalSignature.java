@@ -155,7 +155,7 @@ public class ElGamalSignature {
                 System.out.println("Signature is not verified.");
             }
             System.out.println();
-            System.out.print("Do you want to sign a message? y/n: ");
+            System.out.print("Do you want to sign another message? y/n: ");
             answer = scanner.next().toLowerCase();
         }
         scanner.close();
